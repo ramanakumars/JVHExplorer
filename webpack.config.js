@@ -1,4 +1,5 @@
 const path = require("path");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 /*We are basically telling webpack to take index.js from entry. Then check for all file extensions in resolve. 
 After that apply all the rules in module.rules and produce the output and place it in main.js in the public folder.*/
@@ -17,12 +18,18 @@ module.exports={
         /** "path"
          * the folder path of the output file 
          */
-        path: path.resolve(__dirname, "public"),
+        path: path.resolve(__dirname, "dist"),
         /** "filename"
          * the name of the output file 
          */
-        filename: "main.js"
+        filename: "main.js",
+        publicPath: '/'
     },
+    plugins: [
+        new HtmlWebpackPlugin({
+          template: path.join(__dirname, 'public', 'index.html'),
+        }),
+      ],
     /** "target"
      * setting "node" as target app (server side), and setting it as "web" is 
      * for browser (client side). Default is "web"
@@ -50,7 +57,8 @@ module.exports={
         /** "liveReload"
          * disable live reload on the browser. "hot" must be set to false for this to work
         */
-        liveReload: true
+        liveReload: true,
+        historyApiFallback: true
     },
     resolve: {
         /** "extensions" 
@@ -74,7 +82,7 @@ module.exports={
                 use:  'babel-loader' //loader which we are going to use
             },
             {
-                test: /\.(js|css)$/i,
+                test: /\.(css)$/i,
                 include: path.resolve(__dirname, 'src'),
                 use: ['style-loader', 'css-loader', 'postcss-loader'],
             }
