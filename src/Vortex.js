@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { API_query_extracts, API_query_vortices } from "./API";
 import { LoadingPage } from "./LoadingPage";
+import { get_points, radians, colors } from "./shape_utils";
 
 export default function Vortex({ vortex_id }) {
     const [data, setData] = useState(null);
@@ -45,6 +46,7 @@ export default function Vortex({ vortex_id }) {
 
 const Subject = ({ subject_id, extracts }) => {
     const [subject_url, setSubjectUrl] = useState(null);
+    const [ellipses, setEllipses] = useState([]);
 
     useEffect(() => {
         fetch('https://www.zooniverse.org/api/subjects/' + subject_id, {
@@ -58,12 +60,24 @@ const Subject = ({ subject_id, extracts }) => {
         ));
     }, [subject_id]);
 
-    return (
-        <div key={subject_id}>
-            <h1>Subject: {subject_id}</h1>
-            Number of extracts with this subject: { extracts.length }
-            <img src={subject_url} />
-        </div>
+    useEffect(() => {
+        setEllipses(extracts.map((extract) => (
+            get_points({x: extract.x, y: extract.y, rx: extract.rx, ry: extract.ry, angle: radians(extract.angle)})   
+        )));
+    }, [extracts]);
 
+    return (
+        <div className="bg-primary-200">
+            <h1>Subject: {subject_id}</h1>
+            <svg viewBox="0 0 384 384">
+                <image x="0" y="0" width="384" height="384" href={subject_url} />
+                {ellipses.map((points, index) => (
+                    <polyline 
+                        points={points.map((point) => (point[0] + "," + point[1])).join(" ")}
+                        style={{fill:"none", stroke:colors[extracts[index].color], strokeWidth:2}} 
+                    />
+                ))}
+            </svg>
+        </div>
     )
 }

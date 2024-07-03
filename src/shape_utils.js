@@ -1,0 +1,58 @@
+const flat = 0.06487;
+const beta = 1 / (1 - flat);
+const re = 71492e3;
+const rp = re / beta;
+const pixscale = 7000e3 / 384;
+
+export const round = (number) => Math.round(number * 100) / 100;
+
+export const radians = (angle) => (angle * Math.PI) / 180;
+export const degrees = (angle) => (angle * 180) / Math.PI;
+
+export const colors = {
+    red: "red",
+    brown: "brown",
+    white: "blue",
+    dark: "black",
+};
+
+
+export function get_points(ellipse_params) {
+    const N = 30;
+    const angles = [...Array(N).keys()].map(
+        (number) => (number * 2 * Math.PI) / (N - 1)
+    );
+    const ellipse = angles.map((angle) => [
+        ellipse_params.rx * Math.cos(angle),
+        ellipse_params.ry * Math.sin(angle),
+    ]);
+
+    console.log(ellipse_params);
+
+    return ellipse.map((point) => [
+        point[0] * Math.cos(ellipse_params.angle) -
+        point[1] * Math.sin(ellipse_params.angle) + ellipse_params.x,
+        point[0] * Math.sin(ellipse_params.angle) +
+        point[1] * Math.cos(ellipse_params.angle) + ellipse_params.y,
+    ]);
+}
+
+export function convert_to_lonlat(x, y, lon0, lat0) {
+    // find the distance in pixel coordinates from the center
+    const dx = x;
+    const dy = -y; // opposite to x because of image inversion
+
+    // calculate the shape factors
+    const rln = re / Math.sqrt(1 + ((rp / re) * Math.tan(radians(lat0))) ** 2);
+    const rlt =
+        rln /
+        (Math.cos(radians(lat0)) *
+            (Math.sin(radians(lat0)) ** 2 +
+                ((re / rp) * Math.cos(radians(lat0))) ** 2));
+
+    // difference between image center to pixel in degrees
+    const dlat = degrees(dy * (pixscale / rlt));
+    const dlon = degrees(dx * (pixscale / rln));
+
+    return [lat0 + dlat, lon0 - dlon];
+}
