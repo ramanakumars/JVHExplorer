@@ -1,16 +1,16 @@
-import vortexdata from "./media/vortices.json";
+import { useEffect, useState } from "react";
+import { API_query } from "./API";
 
 export default function PerijoveSelector({}) {
-  const perijove_data = [...Array(23).keys()].map((num) => {
-    const perijove = num + 13;
-    const num_vortices = vortexdata.filter(
-      (vortex) => vortex.perijove == perijove && vortex.num_extracts > 8
-    ).length;
-    return {
-      perijove: perijove,
-      num_vortices: num_vortices,
-    };
-  });
+  const [perijove_data, setPerijoveData] = useState([]);
+
+  useEffect(() => {
+     API_query('_col=perijove&_facet=perijove&_nosuggest=1').then((data) => (
+      setPerijoveData(
+        data.facet_results.perijove.results.map((data_sub) => ({perijove: data_sub.value, num_vortices: data_sub.count})).sort((a, b) => (a.perijove > b.perijove ? 1 : a.perijove < b.perijove ? -1 : 0 ))
+      )
+     ));
+  }, []);
 
   return (
     <div className="container p-2">

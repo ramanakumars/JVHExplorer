@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { MapContainer, Popup, ImageOverlay, Polygon } from "react-leaflet";
 import { CRS } from "leaflet";
-import vortexdata from './media/vortices.json';
+import { API_query } from "./API";
 
 const flat = 0.06487;
 const beta = 1 / (1 - flat);
@@ -77,14 +77,9 @@ export default function Perijove({ perijove }) {
   const [vortices, setVortices] = useState([]);
 
   useEffect(() => {
-    console.log(vortexdata.length);
-    setVortices(
-      vortexdata.filter(
-        (vortex) =>
-          Number(vortex.perijove) === Number(perijove) &&
-          Number(vortex.num_extracts) > 8
-      )
-    );
+    API_query('_size=max&num_extracts__gte=8&perijove='+perijove).then((data) => (
+      setVortices(data.rows)
+    ));
   }, []);
 
   if (vortices.length > 0) {
@@ -105,7 +100,7 @@ export default function Perijove({ perijove }) {
             interactive={true}
           />
           {vortices.map((vortex) => (
-            <VortexEllipse vortex={vortex} key={vortex.lon + vortex.lat} />
+            <VortexEllipse vortex={vortex} key={vortex.id} />
           ))}
         </MapContainer>
       </div>
@@ -143,7 +138,7 @@ function VortexPopup({ vortex }) {
           Sys III Lon/Lat: ({vortex.lon}, {vortex.lat})
         </span>
         <span>
-          Color: {vortex.color} ({round(vortex.colors[vortex.color] * 100)}%)
+          Color: {vortex.color}
         </span>
         <span>Perijove: {vortex.perijove}</span>
         <span>
