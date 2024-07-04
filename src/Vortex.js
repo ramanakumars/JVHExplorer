@@ -74,7 +74,7 @@ const VortexColorDistribution = ({ extracts }) => {
             <VictoryPie
                 data={color_fractions}
                 colorScale={color_fractions.map((fraction) => (colors[fraction.x]))}
-                labels={({ datum }) => (datum.xName + ": " + datum.y)}
+                labels={({ datum }) => (datum.xName + ": " + datum.y + " (" + round(datum.y / extracts.length * 100) + "%)")}
                 labelComponent={<VictoryTooltip constrainToVisibleArea />}
             />
         )
@@ -83,16 +83,25 @@ const VortexColorDistribution = ({ extracts }) => {
 
 const VortexSizeDistribution = ({ extracts }) => {
     const [vortex_sizes, setVortexSizes] = useState([]);
+    const [color, setColor] = useState("red");
 
     useEffect(() => {
         setVortexSizes(extracts.map((extract) => (
             Math.max(Number(extract.physical_width), Number(extract.physical_height)) / 1000
         )));
+
+        let arr = extracts.map((extract) => (extract.color));
+        let _color = arr.sort((a,b) =>
+            arr.filter(v => v===a).length
+          - arr.filter(v => v===b).length
+        ).pop();
+
+        setColor(colors[_color])
     }, [extracts]);
 
     const style = {
         data: {
-            fill: "red"
+            fill: color
         }
     };
 
@@ -100,10 +109,10 @@ const VortexSizeDistribution = ({ extracts }) => {
     if (vortex_sizes.length > 5) {
         let sizes = vortex_sizes.map((size) => ({ x: size }));
         return (
-            <VictoryChart domainPadding={10}>
+            <VictoryChart domainPadding={5}>
                 <VictoryHistogram
                     style={style}
-                    bins={15}
+                    bins={Math.min(15, sizes.length)}
                     data={sizes}
                     labels={({ datum }) => (["(" + datum.x + " - " + datum.x1 + ")", "Count: " + datum.y])}
                     labelComponent={<VictoryTooltip constrainToVisibleArea />}
