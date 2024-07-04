@@ -12,7 +12,7 @@ export const degrees = (angle) => (angle * 180) / Math.PI;
 export const colors = {
     red: "red",
     brown: "brown",
-    white: "blue",
+    white: "dodgerblue",
     dark: "black",
     "white-brown": "sienna",
     "brown-white": "sienna",
