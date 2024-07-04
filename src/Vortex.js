@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { API_query_extracts, API_query_vortices } from "./API";
 import { LoadingPage } from "./LoadingPage";
 import { get_points, radians, colors, round } from "./shape_utils";
+import { VictoryAxis, VictoryChart, VictoryHistogram, VictoryPie, VictoryTooltip } from "victory";
 
 export default function Vortex({ vortex_id }) {
     const [data, setData] = useState(null);
@@ -34,60 +35,84 @@ export default function Vortex({ vortex_id }) {
         <div className="container m-2 p-2 flex flex-col">
             <LoadingPage enabled={loading_enabled} text={"Loading"} />
             <h1>Vortex: {vortex_id}</h1>
-            <div className="container p-2 flex flex-row">
+            <div className="container p-2 flex flex-row [&>div]:min-w-[25%] max-h-96">
                 <div>
                     <h1>Vortex color: </h1>
-                    <ColorFractions extracts={extract_data} />
+                    <VortexColorDistribution extracts={extract_data} />
+                </div>
+
+                <div>
+                    <h1>Vortex size:</h1>
+                    <VortexSizeDistribution extracts={extract_data} />
                 </div>
             </div>
             <div className="container p-2 grid grid-cols-6 gap-2">
                 {subject_ids.map((subject_id) => {
                     const extract_sub = extract_data.filter((extract) => (extract.subject_id === subject_id));
-                    return <Subject subject_id={subject_id} extracts={extract_sub} />
+                    return <Subject key={subject_id} subject_id={subject_id} extracts={extract_sub} />
                 })}
             </div>
         </div>
     );
 }
 
-const ColorFractions = ({ extracts }) => {
-    const [color_fractions, setColors] = useState({});
+const VortexColorDistribution = ({ extracts }) => {
+    const [color_fractions, setColors] = useState(null);
 
     useEffect(() => {
         const _color_fractions = extracts.map((extract) => (extract.color));
         const unique_color_fractions = _color_fractions.reduce((acc, val) => {
-            acc[val] = acc[val] === undefined ? 1 / extracts.length : acc[val] += 1 / extracts.length;
+            acc[val] = acc[val] === undefined ? 1 : acc[val] += 1;
             return acc;
         }, {});
 
-        setColors(unique_color_fractions)
+        setColors(Object.keys(unique_color_fractions).map((key) => ({ x: key, y: unique_color_fractions[key] })));
     }, [extracts]);
 
-    return (
-        <div className="grid grid-cols-4 [&>span]:col-span-1 [&>div]:col-span-3 gap-x-2 gap-y-1 min-w-52">
-            {Object.keys(color_fractions).map((color) => (
-                <>
-                    <span>
-                        {color}
-                    </span>
-                    <div className="w-full flex flex-row flex-nowrap">
-                        <div style={{ width: (color_fractions[color] * 100) + '%', background: colors[color], textAlign: 'right', color: 'white', padding: "0em 0.25em"}}>
-                            {color_fractions[color] > 0.5 &&
-                                <>
-                                    {round(color_fractions[color] * 100)} %
-                                </>
-                            }
-                        </div>
-                        {color_fractions[color] <= 0.5 &&
-                            <div className="w-fit mx-2">
-                                {round(color_fractions[color] * 100)} %
-                            </div>
-                        }
-                    </div>
-                </>
-            ))}
-        </div>
-    )
+    if (color_fractions) {
+        return (
+            <VictoryPie
+                data={color_fractions}
+                colorScale={color_fractions.map((fraction) => (colors[fraction.x]))}
+                labels={({ datum }) => (datum.xName + ": " + datum.y)}
+                labelComponent={<VictoryTooltip constrainToVisibleArea />}
+            />
+        )
+    }
+}
+
+const VortexSizeDistribution = ({ extracts }) => {
+    const [vortex_sizes, setVortexSizes] = useState([]);
+
+    useEffect(() => {
+        setVortexSizes(extracts.map((extract) => (
+            Math.max(Number(extract.physical_width), Number(extract.physical_height)) / 1000
+        )));
+    }, [extracts]);
+
+    const style = {
+        data: {
+            fill: "red"
+        }
+    };
+
+
+    if (vortex_sizes.length > 5) {
+        let sizes = vortex_sizes.map((size) => ({ x: size }));
+        return (
+            <VictoryChart domainPadding={10}>
+                <VictoryHistogram
+                    style={style}
+                    bins={15}
+                    data={sizes}
+                    labels={({ datum }) => (["(" + datum.x + " - " + datum.x1 + ")", "Count: " + datum.y])}
+                    labelComponent={<VictoryTooltip constrainToVisibleArea />}
+                />
+                <VictoryAxis dependentAxis label={"Count"} />
+                <VictoryAxis label={"Size [km]"} />
+            </VictoryChart>
+        )
+    }
 }
 
 const Subject = ({ subject_id, extracts }) => {
@@ -118,7 +143,7 @@ const Subject = ({ subject_id, extracts }) => {
             <svg viewBox="0 0 384 384">
                 <image x="0" y="0" width="384" height="384" href={subject_url} />
                 {ellipses.map((points, index) => (
-                    <polyline
+                    <polyline key={subject_id + " " + index}
                         points={points.map((point) => (point[0] + "," + point[1])).join(" ")}
                         style={{ fill: "none", stroke: colors[extracts[index].color], strokeWidth: 2 }}
                     />
