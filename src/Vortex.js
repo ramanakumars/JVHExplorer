@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { API_query_extracts, API_query_vortices } from "./API";
 import { LoadingPage } from "./LoadingPage";
 import { get_points, radians, colors, round } from "./shape_utils";
-import { VictoryAxis, VictoryChart, VictoryHistogram, VictoryPie, VictoryTooltip } from "victory";
+import { VictoryAxis, VictoryChart, VictoryErrorBar, VictoryHistogram, VictoryLabel, VictoryPie, VictoryScatter, VictoryTooltip } from "victory";
 
 export default function Vortex({ vortex_id }) {
     const [data, setData] = useState(null);
     const [extract_data, setExtractData] = useState([]);
     const [loading_enabled, setLoading] = useState(true);
     const [subject_ids, setSubjectIds] = useState([]);
+    const [vortex_color, setColor] = useState("red");
 
     useEffect(() => {
         API_query_vortices("id=" + vortex_id).then((_data) =>
@@ -28,6 +29,14 @@ export default function Vortex({ vortex_id }) {
     useEffect(() => {
         if (extract_data.length > 0) {
             setSubjectIds(extract_data.map((extract) => (extract.subject_id)).filter((value, index, array) => (array.indexOf(value) === index)))
+
+            let arr = extract_data.map((extract) => (extract.color));
+            let _color = arr.sort((a, b) =>
+                arr.filter(v => v === a).length
+                - arr.filter(v => v === b).length
+            ).pop();
+
+            setColor(colors[_color])
         }
     }, [extract_data]);
 
@@ -35,16 +44,12 @@ export default function Vortex({ vortex_id }) {
         <div className="container m-2 p-2 flex flex-col">
             <LoadingPage enabled={loading_enabled} text={"Loading"} />
             <h1>Vortex: {vortex_id}</h1>
-            <div className="container p-2 flex flex-row [&>div]:min-w-[25%] max-h-96">
-                <div>
-                    <h1>Vortex color: </h1>
-                    <VortexColorDistribution extracts={extract_data} />
-                </div>
+            <div className="container p-2 flex flex-row [&>div]:w-[25%] max-h-96 [&>div]:mx-2">
+                <VortexColorDistribution extracts={extract_data} />
 
-                <div>
-                    <h1>Vortex size:</h1>
-                    <VortexSizeDistribution extracts={extract_data} />
-                </div>
+                <VortexSizeDistribution extracts={extract_data} color={vortex_color} />
+
+                <VortexLocationDistribution extracts={extract_data} color={vortex_color}/>
             </div>
             <div className="container p-2 grid grid-cols-6 gap-2">
                 {subject_ids.map((subject_id) => {
@@ -57,7 +62,7 @@ export default function Vortex({ vortex_id }) {
 }
 
 const VortexColorDistribution = ({ extracts }) => {
-    const [color_fractions, setColors] = useState(null);
+    const [color_fractions, setColors] = useState([]);
 
     useEffect(() => {
         const _color_fractions = extracts.map((extract) => (extract.color));
@@ -66,38 +71,47 @@ const VortexColorDistribution = ({ extracts }) => {
             return acc;
         }, {});
 
-        setColors(Object.keys(unique_color_fractions).map((key) => ({ x: key, y: unique_color_fractions[key] })));
+        const sorted_color_fractions = Object.entries(unique_color_fractions)
+            .sort(([, a], [, b]) => b - a)
+            .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+
+        setColors(Object.keys(sorted_color_fractions).map((key) => ({ x: key, y: sorted_color_fractions[key] })));
     }, [extracts]);
 
-    if (color_fractions) {
+    if (color_fractions.length > 0) {
         return (
-            <VictoryPie
-                data={color_fractions}
-                colorScale={color_fractions.map((fraction) => (colors[fraction.x]))}
-                labels={({ datum }) => (datum.xName + ": " + datum.y + " (" + round(datum.y / extracts.length * 100) + "%)")}
-                labelComponent={<VictoryTooltip constrainToVisibleArea />}
-            />
+            <div>
+                <h1 className="w-full text-center">Vortex color: </h1>
+                <VictoryPie
+                    data={color_fractions}
+                    colorScale={color_fractions.map((fraction) => (colors[fraction.x]))}
+                    labels={({ datum }) => (datum.xName + ": " + datum.y + " (" + round(datum.y / extracts.length * 100) + "%)")}
+                    labelComponent={<VictoryTooltip constrainToVisibleArea />}
+                />
+            </div>
         )
     }
 }
 
-const VortexSizeDistribution = ({ extracts }) => {
+const VortexSizeDistribution = ({ extracts, color }) => {
     const [vortex_sizes, setVortexSizes] = useState([]);
-    const [color, setColor] = useState("red");
+    const [mean_size, setMeanSize] = useState(null);
+    const [mean_std, setMeanStd] = useState(null);
 
     useEffect(() => {
         setVortexSizes(extracts.map((extract) => (
             Math.max(Number(extract.physical_width), Number(extract.physical_height)) / 1000
         )));
 
-        let arr = extracts.map((extract) => (extract.color));
-        let _color = arr.sort((a,b) =>
-            arr.filter(v => v===a).length
-          - arr.filter(v => v===b).length
-        ).pop();
-
-        setColor(colors[_color])
     }, [extracts]);
+
+    useEffect(() => {
+        if (vortex_sizes.length > 0) {
+            const statistics = getMeanStd(vortex_sizes);
+            setMeanSize(statistics.mean);
+            setMeanStd(statistics.stdev);
+        }
+    }, [vortex_sizes]);
 
     const style = {
         data: {
@@ -106,22 +120,102 @@ const VortexSizeDistribution = ({ extracts }) => {
     };
 
 
-    if (vortex_sizes.length > 5) {
+    if (vortex_sizes.length > 0) {
         let sizes = vortex_sizes.map((size) => ({ x: size }));
         return (
-            <VictoryChart domainPadding={5}>
-                <VictoryHistogram
-                    style={style}
-                    bins={Math.min(15, sizes.length)}
-                    data={sizes}
-                    labels={({ datum }) => (["(" + datum.x + " - " + datum.x1 + ")", "Count: " + datum.y])}
-                    labelComponent={<VictoryTooltip constrainToVisibleArea />}
-                />
-                <VictoryAxis dependentAxis label={"Count"} />
-                <VictoryAxis label={"Size [km]"} />
-            </VictoryChart>
+            <div>
+                <h1 className="w-full text-center">Vortex size: {round(mean_size)} &plusmn; {round(mean_std)} km </h1>
+                <VictoryChart domainPadding={30} padding={{left: 60, right: 20, top: 20, bottom: 60}} width={400}>
+                    <VictoryHistogram
+                        style={style}
+                        bins={Math.min(15, sizes.length)}
+                        data={sizes}
+                        labels={({ datum }) => (["(" + datum.x + " - " + datum.x1 + ")", "Count: " + datum.y])}
+                        labelComponent={<VictoryTooltip constrainToVisibleArea />}
+                    />
+                    <VictoryAxis dependentAxis label={"Count"} />
+                    <VictoryAxis label={"Size [km]"} />
+                </VictoryChart>
+            </div>
         )
     }
+}
+
+
+const VortexLocationDistribution = ({ extracts, color }) => {
+    const [vortex_locations, setVortexLocations] = useState([]);
+    const [location_statistics, setLocationStatistics] = useState({});
+
+    useEffect(() => {
+        setVortexLocations(extracts.map((extract) => ([extract.lon, extract.lat])));
+    }, [extracts]);
+
+    useEffect(() => {
+        if (vortex_locations.length > 0) {
+            const lon_stats = getMeanStd((vortex_locations).map((location) => (location[0])));
+            const lat_stats = getMeanStd((vortex_locations).map((location) => (location[1])));
+            setLocationStatistics({ lon: { mean: lon_stats.mean, stdev: lon_stats.stdev }, lat: { mean: lat_stats.mean, stdev: lat_stats.stdev } })
+        }
+    }, [vortex_locations]);
+
+    if ((location_statistics.lon) && (location_statistics.lat)) {
+        console.log(vortex_locations);
+        console.log(location_statistics);
+        const data = vortex_locations.map((location) => ({ x: location[0], y: location[1] }));
+        const mean_data = [{ x: location_statistics.lon.mean, y: location_statistics.lat.mean, errorX: location_statistics.lon.stdev, errorY: location_statistics.lat.stdev}];
+        return (
+            <div>
+                <div className="w-full grid grid-cols-8">
+                    <span className="col-span-3 text-right">
+                        Longitude:
+                    </span>
+                    <span className="col-span-2 text-right">
+                        {round(location_statistics.lon.mean)}
+                    </span>
+                    <span className="text-center">
+                        &plusmn;
+                    </span>
+                    <span>
+                        {round(location_statistics.lon.stdev)} &deg;
+                    </span>
+                    <span>&nbsp;</span>
+                    <span className="col-span-3 text-right">
+                        Latitude:
+                    </span>
+                    <span className="col-span-2 text-right">
+                        {round(location_statistics.lat.mean)}
+                    </span>
+                    <span className="text-center">
+                        &plusmn;
+                    </span>
+                    <span>
+                        {round(location_statistics.lat.stdev)} &deg;
+                    </span>
+                    <span>&nbsp;</span>
+                </div>
+                <VictoryChart domainPadding={30} padding={{left: 60, right: 20, top: 20, bottom: 60}} width={400}>
+                    <VictoryAxis
+                        dependentAxis
+                        label="Planetographic Latitude [&deg;]"
+                        axisLabelComponent={<VictoryLabel dy={-16}/>}
+                        fixLabelOverlap={true}
+                        style={{
+                            axisLabel: {
+                                fontFamily: "inherit",
+                            },
+                            tickLabels: {
+                                fontFamily: "inherit",
+                            }
+                        }}
+                    />
+                    <VictoryAxis invertAxis label="Sys III Longitude [&deg;]" />
+                    <VictoryScatter data={data} style={{data: {fill: color}}}/>
+                    <VictoryErrorBar data={mean_data} symbol={"plus"} size={15} errorX={(datum) => (datum.errorX)} errorY={(datum) => (datum.errorY)}/>
+                </VictoryChart>
+            </div>
+        )
+    }
+
 }
 
 const Subject = ({ subject_id, extracts }) => {
@@ -160,4 +254,13 @@ const Subject = ({ subject_id, extracts }) => {
             </svg>
         </div>
     )
+}
+
+const getMeanStd = (array) => {
+    const mean = array.reduce((acc, val) => (acc + val)) / array.length;
+
+    return {
+        mean: mean,
+        stdev: Math.sqrt(array.map((x) => (Math.pow(x - mean, 2))).reduce((acc, val) => (acc + val)) / array.length)
+    }
 }

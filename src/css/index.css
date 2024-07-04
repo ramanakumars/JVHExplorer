@@ -19,3 +19,7 @@ a {
     height: 70vh;
     width: 100%;
 }
+
+div {
+    box-sizing: border-box;
+}
