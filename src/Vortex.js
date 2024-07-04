@@ -51,7 +51,7 @@ export default function Vortex({ vortex_id }) {
                     <span># of subjects: {subject_ids.length}</span>
                 </div>
             }
-            <div className="container p-2 flex flex-wrap [&>div]:w-[30%] min-h-96 [&>div]:m-2 [&>div]:container [&>div]:min-w-52">
+            <div className="container p-2 flex flex-wrap min-h-96">
                 <VortexColorDistribution extracts={extract_data} />
 
                 <VortexSizeDistribution extracts={extract_data} color={vortex_color} />
@@ -67,6 +67,12 @@ export default function Vortex({ vortex_id }) {
         </div>
     );
 }
+
+const DistributionDiv = ({ children }) => (
+    <div className="w-[30%] m-2 min-w-52">
+        {children}
+    </div>
+)
 
 const VortexColorDistribution = ({ extracts }) => {
     const [color_fractions, setColors] = useState([]);
@@ -87,11 +93,11 @@ const VortexColorDistribution = ({ extracts }) => {
 
     if (color_fractions.length > 0) {
         return (
-            <div>
+            <DistributionDiv>
                 <div className="w-full text-center">Vortex color: </div>
                 <VictoryPie
                     padding={20}
-                    padAngle={5}
+                    padAngle={1}
                     width={400}
                     height={300}
                     data={color_fractions}
@@ -99,7 +105,7 @@ const VortexColorDistribution = ({ extracts }) => {
                     labels={({ datum }) => (datum.xName + ": " + datum.y + " (" + round(datum.y / extracts.length * 100) + "%)")}
                     labelComponent={<VictoryTooltip constrainToVisibleArea />}
                 />
-            </div>
+            </DistributionDiv>
         )
     }
 }
@@ -134,7 +140,7 @@ const VortexSizeDistribution = ({ extracts, color }) => {
     if (vortex_sizes.length > 0) {
         let sizes = vortex_sizes.map((size) => ({ x: size }));
         return (
-            <div>
+            <DistributionDiv>
                 <div className="w-full text-center">Vortex size: {round(mean_size)} &plusmn; {round(mean_std)} km </div>
                 <VictoryChart domainPadding={30} padding={{ left: 60, right: 20, top: 20, bottom: 60 }} width={400}>
                     <VictoryHistogram
@@ -147,7 +153,7 @@ const VortexSizeDistribution = ({ extracts, color }) => {
                     <VictoryAxis dependentAxis label={"Count"} />
                     <VictoryAxis label={"Size [km]"} />
                 </VictoryChart>
-            </div>
+            </DistributionDiv>
         )
     }
 }
@@ -175,7 +181,7 @@ const VortexLocationDistribution = ({ extracts, color }) => {
         const data = vortex_locations.map((location) => ({ x: location[0], y: location[1] }));
         const mean_data = [{ x: location_statistics.lon.mean, y: location_statistics.lat.mean, errorX: location_statistics.lon.stdev, errorY: location_statistics.lat.stdev }];
         return (
-            <div>
+            <DistributionDiv>
                 <div className="w-full grid grid-cols-2">
                     <span className="text-right">
                         Longitude:
@@ -209,7 +215,7 @@ const VortexLocationDistribution = ({ extracts, color }) => {
                     <VictoryScatter data={data} style={{ data: { fill: color } }} />
                     <VictoryErrorBar data={mean_data} symbol={"plus"} size={15} errorX={(datum) => (datum.errorX)} errorY={(datum) => (datum.errorY)} />
                 </VictoryChart>
-            </div>
+            </DistributionDiv>
         )
     }
 
