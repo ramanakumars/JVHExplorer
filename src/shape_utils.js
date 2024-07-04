@@ -14,6 +14,9 @@ export const colors = {
     brown: "brown",
     white: "blue",
     dark: "black",
+    "white-brown": "sienna",
+    "white-red": "salmon",
+    "brown-red": "tomato"
 };
 
 
@@ -26,8 +29,6 @@ export function get_points(ellipse_params) {
         ellipse_params.rx * Math.cos(angle),
         ellipse_params.ry * Math.sin(angle),
     ]);
-
-    console.log(ellipse_params);
 
     return ellipse.map((point) => [
         point[0] * Math.cos(ellipse_params.angle) -
