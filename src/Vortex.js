@@ -43,13 +43,20 @@ export default function Vortex({ vortex_id }) {
     return (
         <div className="container m-2 p-2 flex flex-col">
             <LoadingPage enabled={loading_enabled} text={"Loading"} />
-            <h1>Vortex: {vortex_id}</h1>
-            <div className="container p-2 flex flex-row [&>div]:w-[25%] max-h-96 [&>div]:mx-2">
+            {extract_data.length > 0 &&
+                <div className="flex flex-row [&>span]:mx-2 justify-evenly">
+                    <span>Vortex: {vortex_id}</span>
+                    <span>Perijove: {extract_data[0].perijove}</span>
+                    <span># of classifications: {extract_data.length}</span>
+                    <span># of subjects: {subject_ids.length}</span>
+                </div>
+            }
+            <div className="container p-2 flex flex-wrap [&>div]:w-[30%] min-h-96 [&>div]:m-2 [&>div]:container [&>div]:min-w-52">
                 <VortexColorDistribution extracts={extract_data} />
 
                 <VortexSizeDistribution extracts={extract_data} color={vortex_color} />
 
-                <VortexLocationDistribution extracts={extract_data} color={vortex_color}/>
+                <VortexLocationDistribution extracts={extract_data} color={vortex_color} />
             </div>
             <div className="container p-2 grid grid-cols-6 gap-2">
                 {subject_ids.map((subject_id) => {
@@ -81,8 +88,12 @@ const VortexColorDistribution = ({ extracts }) => {
     if (color_fractions.length > 0) {
         return (
             <div>
-                <h1 className="w-full text-center">Vortex color: </h1>
+                <div className="w-full text-center">Vortex color: </div>
                 <VictoryPie
+                    padding={20}
+                    padAngle={5}
+                    width={400}
+                    height={300}
                     data={color_fractions}
                     colorScale={color_fractions.map((fraction) => (colors[fraction.x]))}
                     labels={({ datum }) => (datum.xName + ": " + datum.y + " (" + round(datum.y / extracts.length * 100) + "%)")}
@@ -124,8 +135,8 @@ const VortexSizeDistribution = ({ extracts, color }) => {
         let sizes = vortex_sizes.map((size) => ({ x: size }));
         return (
             <div>
-                <h1 className="w-full text-center">Vortex size: {round(mean_size)} &plusmn; {round(mean_std)} km </h1>
-                <VictoryChart domainPadding={30} padding={{left: 60, right: 20, top: 20, bottom: 60}} width={400}>
+                <div className="w-full text-center">Vortex size: {round(mean_size)} &plusmn; {round(mean_std)} km </div>
+                <VictoryChart domainPadding={30} padding={{ left: 60, right: 20, top: 20, bottom: 60 }} width={400}>
                     <VictoryHistogram
                         style={style}
                         bins={Math.min(15, sizes.length)}
@@ -162,42 +173,28 @@ const VortexLocationDistribution = ({ extracts, color }) => {
         console.log(vortex_locations);
         console.log(location_statistics);
         const data = vortex_locations.map((location) => ({ x: location[0], y: location[1] }));
-        const mean_data = [{ x: location_statistics.lon.mean, y: location_statistics.lat.mean, errorX: location_statistics.lon.stdev, errorY: location_statistics.lat.stdev}];
+        const mean_data = [{ x: location_statistics.lon.mean, y: location_statistics.lat.mean, errorX: location_statistics.lon.stdev, errorY: location_statistics.lat.stdev }];
         return (
             <div>
-                <div className="w-full grid grid-cols-8">
-                    <span className="col-span-3 text-right">
+                <div className="w-full grid grid-cols-2">
+                    <span className="text-right">
                         Longitude:
                     </span>
-                    <span className="col-span-2 text-right">
-                        {round(location_statistics.lon.mean)}
-                    </span>
                     <span className="text-center">
-                        &plusmn;
+                        {round(location_statistics.lon.mean)} &plusmn; {round(location_statistics.lon.stdev)} &deg;
                     </span>
-                    <span>
-                        {round(location_statistics.lon.stdev)} &deg;
-                    </span>
-                    <span>&nbsp;</span>
-                    <span className="col-span-3 text-right">
+                    <span className="text-right">
                         Latitude:
                     </span>
-                    <span className="col-span-2 text-right">
-                        {round(location_statistics.lat.mean)}
-                    </span>
                     <span className="text-center">
-                        &plusmn;
+                        {round(location_statistics.lat.mean)} &plusmn; {round(location_statistics.lat.stdev)} &deg;
                     </span>
-                    <span>
-                        {round(location_statistics.lat.stdev)} &deg;
-                    </span>
-                    <span>&nbsp;</span>
                 </div>
-                <VictoryChart domainPadding={30} padding={{left: 60, right: 20, top: 20, bottom: 60}} width={400}>
+                <VictoryChart domainPadding={30} padding={{ left: 60, right: 20, top: 20, bottom: 80 }} height={300} width={400}>
                     <VictoryAxis
                         dependentAxis
                         label="Planetographic Latitude [&deg;]"
-                        axisLabelComponent={<VictoryLabel dy={-16}/>}
+                        axisLabelComponent={<VictoryLabel dy={-16} />}
                         fixLabelOverlap={true}
                         style={{
                             axisLabel: {
@@ -209,8 +206,8 @@ const VortexLocationDistribution = ({ extracts, color }) => {
                         }}
                     />
                     <VictoryAxis invertAxis label="Sys III Longitude [&deg;]" />
-                    <VictoryScatter data={data} style={{data: {fill: color}}}/>
-                    <VictoryErrorBar data={mean_data} symbol={"plus"} size={15} errorX={(datum) => (datum.errorX)} errorY={(datum) => (datum.errorY)}/>
+                    <VictoryScatter data={data} style={{ data: { fill: color } }} />
+                    <VictoryErrorBar data={mean_data} symbol={"plus"} size={15} errorX={(datum) => (datum.errorX)} errorY={(datum) => (datum.errorY)} />
                 </VictoryChart>
             </div>
         )
