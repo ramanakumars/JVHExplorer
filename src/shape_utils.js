@@ -15,8 +15,11 @@ export const colors = {
     white: "blue",
     dark: "black",
     "white-brown": "sienna",
+    "brown-white": "sienna",
     "white-red": "salmon",
-    "brown-red": "tomato"
+    "red-white": "salmon",
+    "brown-red": "tomato",
+    "red-brown": "tomato"
 };
 
 
