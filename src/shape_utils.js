@@ -13,7 +13,7 @@ export const colors = {
     red: "red",
     brown: "brown",
     white: "dodgerblue",
-    dark: "black",
+    dark: "#555",
     "white-brown": "sienna",
     "brown-white": "sienna",
     "white-red": "salmon",
@@ -59,4 +59,28 @@ export function convert_to_lonlat(x, y, lon0, lat0) {
     const dlon = degrees(dx * (pixscale / rln));
 
     return [lat0 + dlat, lon0 - dlon];
+}
+
+export function lonlat_to_pixel(lon, lat, x0, y0, lon0, lat0) {
+    const rln = re / Math.sqrt(1 + ((rp / re) * Math.tan(radians(lat0))) ** 2);
+    const rlt =
+        rln /
+        (Math.cos(radians(lat0)) *
+            (Math.sin(radians(lat0)) ** 2 +
+                ((re / rp) * Math.cos(radians(lat0))) ** 2));
+
+    // difference between image center to pixel in degrees
+    let dlat = lat0 - lat;
+    let dlon = lon0 - lon;
+
+    if(dlon > 180) {
+        dlon = dlon - 360;
+    } else if (dlon < -180) {
+        dlon = dlon + 360;
+    }
+
+    const dy = radians(dlat) / (pixscale / rlt);
+    const dx = radians(dlon) / (pixscale / rln);
+
+    return [dx + x0, y0 + dy];
 }
