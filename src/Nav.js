@@ -5,6 +5,7 @@ export default function Nav() {
         <nav id='mainnav' className='container p-4 flex flex-row text-white bg-primary-800 text-lg'>
             <section id='nav-links' className='justify-end items-center flex-auto container flex flex-row'>
                 <NavLink text='home' href='/' />
+                <NavLink text='explorer' href='/explore' />
             </section>
         </nav>
     )

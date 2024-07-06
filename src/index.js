@@ -6,6 +6,7 @@ import PerijoveSelector from "./PerijoveSelector";
 import Nav from "./Nav";
 import Perijove from "./Perijove";
 import Vortex from "./Vortex";
+import Explorer from "./Explorer";
 
 function PerijoveApp() {
   const params = useParams();
@@ -25,6 +26,7 @@ root.render(
           <Nav />
           <Routes>
             <Route exact path="/" element={<PerijoveSelector />} />
+            <Route exact path="/explore" element={<Explorer />} />
             <Route
               exact
               path="/perijove/:perijove_id/"
