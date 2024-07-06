@@ -100,7 +100,7 @@ const ExplorerResults = ({ }) => {
     }, [page, n_pages]);
 
     const nextPage = () => {
-        setPage(Math.min(n_pages, page + 1));
+        setPage(Math.min(n_pages - 1, page + 1));
     }
 
     const prevPage = () => {
