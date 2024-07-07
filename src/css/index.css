@@ -33,5 +33,5 @@ div {
 }
 
 .bar-inner {
-    @apply bg-primary-800 shadow-none border-0 !important;
+    @apply bg-secondary-800 shadow-none border-0 !important;
 }
