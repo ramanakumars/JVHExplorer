@@ -4,9 +4,9 @@ import EditableText from './EditableText';
 import MultiRangeSlider from "multi-range-slider-react";
 import '../css/index.css';
 
-export function InputMultiRange({ minValue, maxValue, step, type, text, onChange, currentMin, currentMax }) {
-	const [_minValue, setMinValue] = useState(parseValue(currentMin, type, minValue));
-	const [_maxValue, setMaxValue] = useState(parseValue(currentMax, type, minValue));
+export function InputMultiRange({ minValue, maxValue, step, type, text, onChange, defaultMin, defaultMax }) {
+	const [_minValue, setMinValue] = useState(parseValue(defaultMin, type, minValue));
+	const [_maxValue, setMaxValue] = useState(parseValue(defaultMax, type, minValue));
 	const absMin = parseValue(minValue, type, 0);
 	const absMax = parseValue(maxValue, type, 0);
 
@@ -27,9 +27,9 @@ export function InputMultiRange({ minValue, maxValue, step, type, text, onChange
 	};
 
 	useEffect(() => {
-		setMaxValue(validateMax(_maxValue));
-		setMinValue(validateMin(_minValue));
-	}, [minValue, maxValue, _minValue, _maxValue, absMin, absMax]);
+		setMaxValue(validateMax(defaultMax));
+		setMinValue(validateMin(defaultMin));
+	}, [defaultMin, defaultMax, absMin, absMax]);
 
 	useEffect(() => {
 		onChange(_minValue, _maxValue);
