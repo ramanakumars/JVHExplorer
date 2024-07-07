@@ -2,7 +2,8 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { API_query_extracts, API_query_subjects, API_query_vortices } from "./API";
 import { InputMultiRange } from "./Inputs/InputMultiRange";
 import Subject from "./Subject";
-import { lonlat_to_pixel } from "./shape_utils";
+import { colors, lonlat_to_pixel } from "./shape_utils";
+import { Checkbox } from "./Inputs/Checkbox";
 
 const VortexData = createContext(null);
 const FilteredVortexData = createContext(null);
@@ -47,6 +48,7 @@ const Sidebar = ({ }) => {
     const [size, setSize] = useState({ minValue: 0, currentMin: 0, currentMax: 5000, maxValue: 5000 });
     const [perijove, setPerijove] = useState({ minValue: 13, currentMin: 13, currentMax: 36, maxValue: 36 });
     const [num_extract, setNumExtracts] = useState({ minValue: 0, currentMin: 8, currentMax: 50, maxValue: 50 });
+    const [colors_checked, setColorsChecked] = useState({white: true, brown: true, red: true, dark: true});
 
     useEffect(() => {
         if (vortex_data.length > 0) {
@@ -64,17 +66,21 @@ const Sidebar = ({ }) => {
             setFilteredVortexData(
                 vortex_data.filter((vortex) => {
                     const sizei = Math.max(vortex.physical_height, vortex.physical_width) / 1000.;
-                    return (compareMinMax(sizei, size) && compareMinMax(vortex.perijove, perijove) && compareMinMax(vortex.num_extracts, num_extract))
+                    return (compareMinMax(sizei, size) && compareMinMax(vortex.perijove, perijove) && compareMinMax(vortex.num_extracts, num_extract) && (colors_checked[vortex.color]))
                 })
             )
         }
-    }, [size, perijove, num_extract]);
+    }, [size, perijove, num_extract, colors_checked]);
 
     return (
         <div className="p-2 col-span-1 bg-primary-200 min-h-screen box-border">
-            <InputMultiRange key={size.minValue + size.maxValue} minValue={size.minValue} maxValue={size.maxValue} type='float' text={'Size [km]'} onChange={(minValue, maxValue) => setSize({ ...size, currentMin: minValue, currentMax: maxValue })} currentMin={size.currentMin} currentMax={size.currentMax} />
-            <InputMultiRange key={perijove.minValue + perijove.maxValue} minValue={perijove.minValue} maxValue={perijove.maxValue} type='int' text={'Perijove'} onChange={(minValue, maxValue) => setPerijove({ ...perijove, currentMin: minValue, currentMax: maxValue })} currentMin={perijove.currentMin} currentMax={perijove.currentMax} />
-            <InputMultiRange key={num_extract.minValue + num_extract.maxValue} minValue={num_extract.minValue} maxValue={num_extract.maxValue} type='int' text={'num_extract'} onChange={(minValue, maxValue) => setNumExtracts({ ...num_extract, currentMin: minValue, currentMax: maxValue })} currentMin={num_extract.currentMin} currentMax={num_extract.currentMax} />
+            <InputMultiRange key={size.minValue + size.maxValue} minValue={size.minValue} maxValue={size.maxValue} type='float' text={'Size [km]'} onChange={(minValue, maxValue) => setSize(prevState => ({ ...prevState, currentMin: minValue, currentMax: maxValue }))} defaultMin={size.minValue} defaultMax={size.maxValue} />
+            <InputMultiRange key={perijove.minValue + perijove.maxValue} minValue={perijove.minValue} maxValue={perijove.maxValue} type='int' text={'Perijove'} onChange={(minValue, maxValue) => setPerijove(prevState => ({ ...prevState, currentMin: minValue, currentMax: maxValue }))} defaultMin={perijove.minValue} defaultMax={perijove.maxValue} />
+            <InputMultiRange key={num_extract.minValue + num_extract.maxValue} minValue={num_extract.minValue} maxValue={num_extract.maxValue} type='int' text={'# of extracts'} onChange={(minValue, maxValue) => setNumExtracts(prevState => ({ ...prevState, currentMin: minValue, currentMax: maxValue }))} defaultMin={num_extract.minValue} defaultMax={num_extract.maxValue} />
+            <Checkbox key={'white'} value={colors_checked.white} text='White vortices' name='white_vortices' onChange={(e) => setColorsChecked(prevState => ({...prevState, white: !prevState.white}))} />
+            <Checkbox key={'red'} value={colors_checked.red} text='Red vortices' name='red_vortices' onChange={(e) => setColorsChecked(prevState => ({...prevState, red: !prevState.red}))} />
+            <Checkbox key={'brown'} value={colors_checked.brown} text='Brown vortices' name='brown_vortices' onChange={(e) => setColorsChecked(prevState => ({...prevState, brown: !prevState.brown}))} />
+            <Checkbox key={'dark'} value={colors_checked.dark} text='Dark vortices' name='dark_vortices' onChange={(e) => setColorsChecked(prevState => ({...prevState, dark: !prevState.dark}))} />
         </div>
     )
 }
