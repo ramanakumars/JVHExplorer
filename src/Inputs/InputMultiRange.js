@@ -37,7 +37,7 @@ export function InputMultiRange({ minValue, maxValue, step, type, text, onChange
 
 	return (
 		<div className='w-full flex flex-wrap justify-between box-border'>
-			<label>{text}: </label>
+			<label className="font-bold">{text}: </label>
 			<MultiRangeSlider
 				min={absMin}
 				max={absMax}
