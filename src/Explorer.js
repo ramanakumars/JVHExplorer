@@ -5,21 +5,29 @@ import Subject from "./Subject";
 import { colors, lonlat_to_pixel } from "./shape_utils";
 import { Checkbox } from "./Inputs/Checkbox";
 import { Link } from "react-router-dom";
+import { LoadingPage } from "./LoadingPage";
 
 const VortexData = createContext(null);
 const FilteredVortexData = createContext(null);
 
 export default function Explorer({ }) {
-    const [search_params, setSearchParams] = useState({});
     const [vortex_data, setVortexData] = useState([]);
     const [filtered_vortex_data, setFilteredVortexData] = useState([]);
+    const [loading_enabled, setLoading] = useState(true);
 
     useEffect(() => {
         API_query_vortices("_size=max").then((data) => (setVortexData(data.rows)));
     }, []);
 
+    useEffect(() => {
+        if(vortex_data.length > 0) {
+            setLoading(false);
+        }
+    }, [vortex_data]);
+
     return (
         <div className="container m-0 grid grid-cols-5 gap-2">
+            <LoadingPage enabled={loading_enabled} text="Loading" />
             <FilteredVortexData.Provider value={{ filtered_vortex_data: filtered_vortex_data, setFilteredVortexData: setFilteredVortexData }}>
                 <VortexData.Provider value={{ vortex_data: vortex_data, setVortexData: setVortexData }}>
                     <Sidebar />

@@ -42,7 +42,7 @@ export default function Perijove({ perijove }) {
                             [90, 0],
                             [-90, 360],
                         ]}
-                        url={"https://jvhexplorer-perijovedata.storage.googleapis.com/PJs/PJ" + perijove + "/globe_mosaic_highres.png"}
+                        url={"/PJs/PJ" + perijove + "/globe_mosaic_highres.png"}
                         interactive={true}
                     />
                     {vortices.map((vortex) => (
