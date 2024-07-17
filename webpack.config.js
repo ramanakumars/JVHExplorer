@@ -9,7 +9,7 @@ module.exports = {
    * the environment - development, production, none. tells webpack
    * to use its built-in optimizations accordingly. default is production
    */
-  mode: "production",
+  mode: "development",
   /** "entry"
    * the entry point
    */
@@ -23,7 +23,7 @@ module.exports = {
      * the name of the output file
      */
     filename: "main.js",
-    publicPath: "/jvhexplorer",
+    publicPath: "/",
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -62,7 +62,14 @@ module.exports = {
     proxy: [
       {
         context: ["/vortices"],
-        target: "http://localhost:8001",
+        target: "https://jvhexplorer-data-v4dvgredga-uc.a.run.app",
+        changeOrigin: true,
+        logLevel: "debug",
+      },
+      {
+        context: ["/PJs/"],
+        target: "https://jvhexplorer-perijovedata.storage.googleapis.com",
+        changeOrigin: true,
         logLevel: "debug",
       },
     ],
