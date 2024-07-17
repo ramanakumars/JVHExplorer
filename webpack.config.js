@@ -9,7 +9,7 @@ module.exports = {
    * the environment - development, production, none. tells webpack
    * to use its built-in optimizations accordingly. default is production
    */
-  mode: "development",
+  mode: "production",
   /** "entry"
    * the entry point
    */
@@ -23,7 +23,7 @@ module.exports = {
      * the name of the output file
      */
     filename: "main.js",
-    publicPath: "/",
+    publicPath: "/jvhexplorer",
   },
   plugins: [
     new HtmlWebpackPlugin({

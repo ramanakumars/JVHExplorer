@@ -3,6 +3,7 @@ import { MapContainer, Popup, ImageOverlay, Polygon } from "react-leaflet";
 import { CRS } from "leaflet";
 import { API_query_vortices } from "./API";
 import { get_points, convert_to_lonlat, round, radians, colors } from './shape_utils'
+import { Link } from "react-router-dom";
 
 function Ellipse({ ellipse_params, lon0, lat0, color, children }) {
     const points = get_points(ellipse_params);
@@ -41,7 +42,7 @@ export default function Perijove({ perijove }) {
                             [90, 0],
                             [-90, 360],
                         ]}
-                        url={"/PJs/PJ" + perijove + "/globe_mosaic_highres.png"}
+                        url={"https://jvhexplorer-perijovedata.storage.googleapis.com/PJs/PJ" + perijove + "/globe_mosaic_highres.png"}
                         interactive={true}
                     />
                     {vortices.map((vortex) => (
@@ -93,7 +94,7 @@ function VortexPopup({ vortex }) {
                 <span># of classifications: {vortex.num_extracts} </span>
                 <span>Vortex size confidence: {round(vortex.probability * 100)}% </span>
                 <span>
-                    <a href={"/vortex/" + vortex.id}>See more</a>
+                    <Link to={"/vortex/" + vortex.id}>See more</Link>
                 </span>
             </div>
         </Popup>

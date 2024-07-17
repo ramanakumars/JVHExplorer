@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Explorer App for the Jovian Vortex Hunter data",
   "main": "src/index.js",
+  "homepage": "/jvhexplorer",
   "scripts": {
     "start": "webpack-dev-server .",
     "build": "Webpack .",
