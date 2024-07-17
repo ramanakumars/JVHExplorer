@@ -177,8 +177,6 @@ const VortexLocationDistribution = ({ extracts, color }) => {
     }, [vortex_locations]);
 
     if ((location_statistics.lon) && (location_statistics.lat)) {
-        console.log(vortex_locations);
-        console.log(location_statistics);
         const data = vortex_locations.map((location) => ({ x: location[0], y: location[1] }));
         const mean_data = [{ x: location_statistics.lon.mean, y: location_statistics.lat.mean, errorX: location_statistics.lon.stdev, errorY: location_statistics.lat.stdev }];
         return (
