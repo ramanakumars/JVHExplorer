@@ -22,7 +22,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
     <React.StrictMode>
       <article id="main" className="container box-border mx-auto">
-        <BrowserRouter>
+        <BrowserRouter basename='/jvhexplorer'>
           <Nav />
           <Routes>
             <Route exact path="/" element={<PerijoveSelector />} />

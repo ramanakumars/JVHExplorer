@@ -4,6 +4,7 @@ import { InputMultiRange } from "./Inputs/InputMultiRange";
 import Subject from "./Subject";
 import { colors, lonlat_to_pixel } from "./shape_utils";
 import { Checkbox } from "./Inputs/Checkbox";
+import { Link } from "react-router-dom";
 
 const VortexData = createContext(null);
 const FilteredVortexData = createContext(null);
@@ -149,9 +150,9 @@ const VortexSample = ({ vortex }) => {
 
     return (
         <div>
-            <a href={'/vortex/' + vortex.id} target='_blank' rel="noopener noreferrer" className="text-primary-800 hover:text-primary-300 hover:[&>div]:bg-primary-600">
+            <Link to={'/vortex/' + vortex.id} target='_blank' rel="noopener noreferrer" className="text-primary-800 hover:text-primary-300 hover:[&>div]:bg-primary-600">
                 <Subject subject_id={vortex.closest_subject_id} extracts={ellipse_path} title={"Vortex: " + vortex.id} />
-            </a>
+            </Link>
         </div>
     )
 }
