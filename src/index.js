@@ -18,11 +18,13 @@ function VortexApp() {
   return <Vortex vortex_id={params.vortex_id} />;
 }
 
+const basename = process.env.NODE_ENV === 'development' ? '/' : '/jvhexplorer';
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
     <React.StrictMode>
       <article id="main" className="container box-border mx-auto">
-        <BrowserRouter>
+        <BrowserRouter basename={basename}>
           <Nav />
           <Routes>
             <Route exact path="/" element={<PerijoveSelector />} />

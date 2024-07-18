@@ -1,5 +1,12 @@
 const path = require("path");
+const JSON = require("json5");
+const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+
+const ENV_TYPE = process.env.TYPE;
+const PUBLIC_URL = ENV_TYPE === 'development' ? '/' : '/jvhexplorer';
+
+console.log(ENV_TYPE)
 
 /*We are basically telling webpack to take index.js from entry. Then check for all file extensions in resolve. 
 After that apply all the rules in module.rules and produce the output and place it in main.js in the public folder.*/
@@ -9,7 +16,7 @@ module.exports = {
    * the environment - development, production, none. tells webpack
    * to use its built-in optimizations accordingly. default is production
    */
-  mode: "development",
+  mode: ENV_TYPE,
   /** "entry"
    * the entry point
    */
@@ -23,7 +30,7 @@ module.exports = {
      * the name of the output file
      */
     filename: "main.js",
-    publicPath: "/",
+    publicPath: PUBLIC_URL
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -47,7 +54,7 @@ module.exports = {
     /** "open"
      * opens the browser after server is successfully started
      */
-    open: true,
+    open: [PUBLIC_URL],
     /** "hot"
      * enabling and disabling HMR. takes "true", "false" and "only".
      * "only" is used if enable Hot Module Replacement without page
