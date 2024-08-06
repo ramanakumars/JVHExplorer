@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MapContainer, Popup, ImageOverlay, Polygon } from "react-leaflet";
+import { MapContainer, Popup, Polygon, TileLayer } from "react-leaflet";
 import { CRS } from "leaflet";
 import { API_query_vortices } from "./API";
 import { get_points, convert_to_lonlat, round, radians, colors } from './shape_utils'
@@ -32,19 +32,17 @@ export default function Perijove({ perijove }) {
         return (
             <div className="w-full p-4 m-2 flex justify-center">
                 <MapContainer
-                    center={[0, 180]}
-                    zoom={2}
+                    center={[0, 0]}
+                    zoom={1}
                     scrollWheelZoom={true}
-                    crs={CRS.Simple}
                 >
-                    <ImageOverlay
-                        bounds={[
-                            [90, 0],
-                            [-90, 360],
-                        ]}
-                        url={"/PJs/PJ" + perijove + "/globe_mosaic_highres.png"}
-                        interactive={true}
+                    <TileLayer
+                        minZoom={0}
+                        maxZoom={5}
+                        url={"/PJs/tiles/PJ" + perijove + "/{z}/{x}/{-y}.png"}
+                        attribution=""
                     />
+
                     {vortices.map((vortex) => (
                         <VortexEllipse vortex={vortex} key={vortex.id} />
                     ))}
@@ -55,9 +53,12 @@ export default function Perijove({ perijove }) {
 }
 
 const VortexEllipse = ({ vortex }) => {
-    var loni = 180 - vortex.lon;
-    if (loni < 0) {
+    var loni = 360 - vortex.lon;
+    if (loni < -180) {
         loni += 360;
+    }
+    if (loni > 180) {
+        loni -= 360;
     }
     const ellipse_params = {
         x: vortex.x,
