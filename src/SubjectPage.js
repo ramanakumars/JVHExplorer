@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { MapContainer, TileLayer, Polygon, Polyline } from "react-leaflet";
 import { convert_to_lonlat, round } from "./shape_utils";
 import { Checkbox } from "./Inputs/Checkbox";
-import { Ellipse, VortexEllipse } from "./Perijove";
+import { VortexEllipse } from "./shape_utils";
 
 export default function SubjectPage({ subject_id }) {
     const [subject_metadata, setSubjectMetadata] = useState({});
