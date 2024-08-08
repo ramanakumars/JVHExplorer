@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { API_query_extracts, API_query_vortices } from "./API";
 import { LoadingPage } from "./LoadingPage";
 import Subject from "./Subject";
-import { get_points, radians, colors, round } from "./shape_utils";
+import { Link } from "react-router-dom";
+import { colors, round } from "./shape_utils";
 import { VictoryAxis, VictoryChart, VictoryErrorBar, VictoryHistogram, VictoryLabel, VictoryPie, VictoryScatter, VictoryTooltip } from "victory";
 
 export default function Vortex({ vortex_id }) {
@@ -62,7 +63,11 @@ export default function Vortex({ vortex_id }) {
             <div className="container p-2 grid grid-cols-6 gap-2">
                 {subject_ids.map((subject_id) => {
                     const extract_sub = extract_data.filter((extract) => (extract.subject_id === subject_id));
-                    return <Subject key={subject_id} subject_id={subject_id} extracts={extract_sub} />
+                    return (
+                        <Link key={subject_id} to={'/subject/' + subject_id} target='_blank' rel="noopener noreferrer" className="text-primary-800 hover:text-primary-300 hover:[&>div]:bg-primary-600">
+                            <Subject subject_id={subject_id} extracts={extract_sub} />
+                        </Link>
+                    )
                 })}
             </div>
         </div>
@@ -95,7 +100,7 @@ const VortexColorDistribution = ({ extracts }) => {
     if (color_fractions.length > 0) {
         return (
             <DistributionDiv>
-                <div className="w-full text-center">Vortex color: </div>
+                <div className="w-full text-center">Vortex color: {color_fractions[0].x}</div>
                 <VictoryPie
                     padding={20}
                     padAngle={1}
