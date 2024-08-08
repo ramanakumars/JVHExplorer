@@ -5,7 +5,7 @@ import { API_query_vortices } from "./API";
 import { get_points, convert_to_lonlat, round, radians, colors } from './shape_utils'
 import { Link } from "react-router-dom";
 
-function Ellipse({ ellipse_params, lon0, lat0, color, children }) {
+export function Ellipse({ ellipse_params, lon0, lat0, color, children }) {
     const points = get_points(ellipse_params);
 
     const positions = points.map((point) =>
@@ -33,7 +33,7 @@ export default function Perijove({ perijove }) {
             <div className="w-full p-4 m-2 flex justify-center">
                 <MapContainer
                     center={[0, 0]}
-                    zoom={1}
+                    zoom={2}
                     scrollWheelZoom={true}
                 >
                     <TileLayer
@@ -52,7 +52,7 @@ export default function Perijove({ perijove }) {
     }
 }
 
-const VortexEllipse = ({ vortex }) => {
+export const VortexEllipse = ({ vortex }) => {
     var loni = 360 - vortex.lon;
     if (loni < -180) {
         loni += 360;
@@ -79,12 +79,12 @@ const VortexEllipse = ({ vortex }) => {
     );
 };
 
-function VortexPopup({ vortex }) {
+export function VortexPopup({ vortex }) {
     return (
         <Popup>
             <div className="flex flex-col container [&>span]:p-1">
                 <span>
-                    Sys III Lon/Lat: ({vortex.lon}, {vortex.lat})
+                    Sys III Lon/Lat: ({round(vortex.lon)}, {round(vortex.lat)})
                 </span>
                 <span>Color: {vortex.color}</span>
                 <span>Perijove: {vortex.perijove}</span>
