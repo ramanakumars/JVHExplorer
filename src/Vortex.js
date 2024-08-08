@@ -64,8 +64,8 @@ export default function Vortex({ vortex_id }) {
                 {subject_ids.map((subject_id) => {
                     const extract_sub = extract_data.filter((extract) => (extract.subject_id === subject_id));
                     return (
-                        <Link to={'/subject/' + subject_id} target='_blank' rel="noopener noreferrer" className="text-primary-800 hover:text-primary-300 hover:[&>div]:bg-primary-600">
-                            <Subject key={subject_id} subject_id={subject_id} extracts={extract_sub} />
+                        <Link key={subject_id} to={'/subject/' + subject_id} target='_blank' rel="noopener noreferrer" className="text-primary-800 hover:text-primary-300 hover:[&>div]:bg-primary-600">
+                            <Subject subject_id={subject_id} extracts={extract_sub} />
                         </Link>
                     )
                 })}
@@ -100,7 +100,7 @@ const VortexColorDistribution = ({ extracts }) => {
     if (color_fractions.length > 0) {
         return (
             <DistributionDiv>
-                <div className="w-full text-center">Vortex color: </div>
+                <div className="w-full text-center">Vortex color: {color_fractions[0].x}</div>
                 <VictoryPie
                     padding={20}
                     padAngle={1}
