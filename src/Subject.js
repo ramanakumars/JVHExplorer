@@ -1,20 +1,13 @@
 import { useState, useEffect } from "react";
 import { get_points, radians, colors } from "./shape_utils";
+import { API_query_subject_image } from "./API";
 
 export default function Subject({ subject_id, extracts, title }) {
     const [subject_url, setSubjectUrl] = useState(null);
     const [ellipses, setEllipses] = useState([]);
 
     useEffect(() => {
-        fetch('https://www.zooniverse.org/api/subjects/' + subject_id, {
-            method: "GET",
-            headers: {
-                Accept: "application/vnd.api+json; version=1",
-                "Content-Type": "application/json",
-            }
-        }).then((result) => (
-            result.json().then((data) => (setSubjectUrl(data.subjects[0].locations[0]['image/png'])))
-        ));
+        API_query_subject_image(subject_id).then((url) => (setSubjectUrl(url)))
     }, [subject_id]);
 
     useEffect(() => {
