@@ -7,6 +7,7 @@ import Nav from "./Nav";
 import Perijove from "./Perijove";
 import Vortex from "./Vortex";
 import Explorer from "./Explorer";
+import SubjectPage from "./SubjectPage";
 
 function PerijoveApp() {
   const params = useParams();
@@ -16,6 +17,11 @@ function PerijoveApp() {
 function VortexApp() {
   const params = useParams();
   return <Vortex vortex_id={params.vortex_id} />;
+}
+
+function SubjectApp() {
+  const params = useParams();
+  return <SubjectPage subject_id={params.subject_id} />;
 }
 
 const basename = process.env.NODE_ENV === 'development' ? '/' : '/jvhexplorer';
@@ -35,6 +41,7 @@ root.render(
               element={<PerijoveApp />}
             />
             <Route exact path="/vortex/:vortex_id/" element={<VortexApp />} />
+            <Route exact path="/subject/:subject_id/" element={<SubjectApp />} />
           </Routes>
         </BrowserRouter>
       </article>
