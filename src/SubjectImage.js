@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { get_points, radians, colors } from "./shape_utils";
+import { get_points, radians, colors } from "./ShapeUtils/GeoUtils";
 import { API_query_subject_image } from "./API";
 
-export default function Subject({ subject_id, extracts, title }) {
+export default function SubjectImage({ subject_id, extracts, title }) {
     const [subject_url, setSubjectUrl] = useState(null);
     const [ellipses, setEllipses] = useState([]);
 

@@ -1,0 +1,61 @@
+import { MapContainer, TileLayer, Polyline } from "react-leaflet";
+import { convert_to_lonlat } from "../ShapeUtils/GeoUtils";
+import { Checkbox } from "../Inputs/Checkbox";
+import VortexEllipse from "../ShapeUtils/VortexEllipse";
+import { useState, useEffect } from "react";
+import { API_query_extracts, API_query_vortices } from "../API";
+
+export default function SubjectMap({ subject_id, subject_metadata }) {
+    const [show_vortices, setShowVortices] = useState(false);
+    const [vortices, setVortices] = useState([]);
+    const [extracts, setExtracts] = useState([]);
+
+    const perijove = subject_metadata.perijove;
+
+    const edge_pixels = [[-192, -192], [-192, 192], [192, 192], [192, -192], [-192, -192]];
+    const edge_lonlat = edge_pixels.map((pixel) => convert_to_lonlat(pixel[0], pixel[1], subject_metadata.longitude, subject_metadata.latitude));
+
+    useEffect(() => {
+        API_query_extracts("subject_id=" + subject_id).then((data) => (setExtracts(data.rows)));
+    }, [subject_id]);
+
+    useEffect(() => {
+        if (extracts.length > 0) {
+            const vortex_ids = extracts.map((extract) => (extract.vortex));
+            const unique_vortex_ids = vortex_ids.filter((vort, index, arr) => (arr.indexOf(vort) === index));
+            API_query_vortices("id__in=" + unique_vortex_ids.join(',')).then((data) => (setVortices(data.rows)));
+        };
+    }, [extracts]);
+
+    return (
+        <div className="w-full p-4 m-2 flex justify-center">
+            <MapContainer
+                center={[subject_metadata.latitude, subject_metadata.longitude]}
+                zoom={5}
+                scrollWheelZoom={true}
+                className="!h-[800px]"
+            >
+                { (vortices.length > 0) &&
+                    <div className="absolute text-white right-10 top-10 bg-slate-500 z-[500] px-2 text-lg" >
+                        <Checkbox value={show_vortices} text={"Show vortices"} name={"vortices"} onChange={(e) => setShowVortices(!show_vortices)} />
+                    </div>
+                }
+
+                <TileLayer
+                    minZoom={0}
+                    maxZoom={5}
+                    url={"/PJs/tiles/PJ" + perijove + "/{z}/{x}/{-y}.png"}
+                    attribution=""
+                />
+                <Polyline positions={edge_lonlat} pathOptions={{ color: 'black' }} opacity={1} />
+
+                {(show_vortices && (vortices.length > 0)) &&
+                    vortices.map((vortex) => (
+                        <VortexEllipse vortex={vortex} key={vortex.id} opacity={0.8}/>
+                    ))
+                }
+
+            </MapContainer>
+        </div>
+    )
+}

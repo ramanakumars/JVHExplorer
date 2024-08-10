@@ -74,9 +74,10 @@ module.exports = {
         logLevel: "debug",
       },
       {
-        context: ["/PJs/"],
+        context: ["/PJs"],
         target: "https://jvhexplorer-perijovedata.storage.googleapis.com",
         changeOrigin: true,
+        pathRewrite: {"^/PJs": ''},
         logLevel: "debug",
       },
     ],
