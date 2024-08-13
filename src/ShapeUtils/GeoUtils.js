@@ -9,6 +9,15 @@ export const round = (number) => Math.round(number * 100) / 100;
 export const radians = (angle) => (angle * Math.PI) / 180;
 export const degrees = (angle) => (angle * 180) / Math.PI;
 
+export const sanitize_longitude = (lon) => {
+    if(lon > 180) {
+        lon = lon - 360;
+    } else if (lon < -180) {
+        lon = lon + 360;
+    }
+    return lon;
+}
+
 export const colors = {
     red: "red",
     brown: "brown",
@@ -70,13 +79,7 @@ export function lonlat_to_pixel(lon, lat, x0, y0, lon0, lat0) {
 
     // difference between image center to pixel in degrees
     let dlat = lat0 - lat;
-    let dlon = lon0 - lon;
-
-    if(dlon > 180) {
-        dlon = dlon - 360;
-    } else if (dlon < -180) {
-        dlon = dlon + 360;
-    }
+    let dlon = sanitize_longitude(lon0 - lon);
 
     const dy = radians(dlat) / (pixscale / rlt);
     const dx = radians(dlon) / (pixscale / rln);
