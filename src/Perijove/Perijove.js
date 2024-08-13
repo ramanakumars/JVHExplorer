@@ -19,6 +19,7 @@ export default function Perijove({ perijove }) {
                     center={[0, 0]}
                     zoom={2}
                     scrollWheelZoom={true}
+                    worldCopyJump={true}
                 >
                     <TileLayer
                         minZoom={0}
