@@ -36,7 +36,8 @@ export default function PerijoveSelector({ }) {
 const Card = ({ perijove }) => {
     return (
         <Link
-            className="min-w-52 bg-primary-300 m-2 p-2 flex flex-col text-center hover:bg-primary-500 cursor-pointer text-black hover:text-black"
+            className="min-w-52 min-h-52 bg-primary-200 bg-opacity-95 m-2 p-2 flex flex-col justify-center items-center bg-cover text-center bg-blend-overlay hover:bg-opacity-45 hover:bg-black cursor-pointer font-bold text-black hover:text-white"
+            style={{ "backgroundImage": "url('/PJs/PJimgs/PJ" + perijove.perijove + "/globe_mosaic.png')"}}
             to={"/perijove/" + perijove.perijove}
         >
             <span className="w-full">PJ {perijove.perijove}</span>

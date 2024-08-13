@@ -4,10 +4,10 @@ import "./css/index.css";
 import { BrowserRouter, Route, Routes, useParams } from "react-router-dom";
 import PerijoveSelector from "./PerijoveSelector";
 import Nav from "./Nav";
-import Perijove from "./Perijove";
+import Perijove from "./Perijove/Perijove";
 import Vortex from "./Vortex";
-import Explorer from "./Explorer";
-import SubjectPage from "./SubjectPage";
+import Explorer from "./Explorer/Explorer";
+import Subject from "./Subject/Subject";
 
 function PerijoveApp() {
   const params = useParams();
@@ -21,7 +21,7 @@ function VortexApp() {
 
 function SubjectApp() {
   const params = useParams();
-  return <SubjectPage subject_id={params.subject_id} />;
+  return <Subject subject_id={params.subject_id} />;
 }
 
 const basename = process.env.NODE_ENV === 'development' ? '/' : '/jvhexplorer';

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { API_query_extracts, API_query_vortices } from "./API";
 import { LoadingPage } from "./LoadingPage";
-import Subject from "./Subject";
+import SubjectImage from "./SubjectImage";
 import { Link } from "react-router-dom";
-import { colors, round } from "./shape_utils";
+import { colors, round } from "./ShapeUtils/GeoUtils";
 import { VictoryAxis, VictoryChart, VictoryErrorBar, VictoryHistogram, VictoryLabel, VictoryPie, VictoryScatter, VictoryTooltip } from "victory";
 
 export default function Vortex({ vortex_id }) {
@@ -65,7 +65,7 @@ export default function Vortex({ vortex_id }) {
                     const extract_sub = extract_data.filter((extract) => (extract.subject_id === subject_id));
                     return (
                         <Link key={subject_id} to={'/subject/' + subject_id} target='_blank' rel="noopener noreferrer" className="text-primary-800 hover:text-primary-300 hover:[&>div]:bg-primary-600">
-                            <Subject subject_id={subject_id} extracts={extract_sub} />
+                            <SubjectImage subject_id={subject_id} extracts={extract_sub} />
                         </Link>
                     )
                 })}

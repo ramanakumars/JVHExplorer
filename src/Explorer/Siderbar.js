@@ -1,56 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react"
-import { API_query_extracts, API_query_subjects, API_query_vortices } from "./API";
-import { InputMultiRange } from "./Inputs/InputMultiRange";
-import Subject from "./Subject";
-import { colors, lonlat_to_pixel } from "./shape_utils";
-import { Checkbox } from "./Inputs/Checkbox";
-import { Link } from "react-router-dom";
-import { LoadingPage } from "./LoadingPage";
+import { InputMultiRange } from "../Inputs/InputMultiRange";
+import { Checkbox } from "../Inputs/Checkbox";
+import { useState, useContext, useEffect } from "react";
+import { VortexData, FilteredVortexData } from "./Explorer";
+import { setMinMax, compareMinMax } from "./MinMax";
 
-const VortexData = createContext(null);
-const FilteredVortexData = createContext(null);
-
-export default function Explorer({ }) {
-    const [vortex_data, setVortexData] = useState([]);
-    const [filtered_vortex_data, setFilteredVortexData] = useState([]);
-    const [loading_enabled, setLoading] = useState(true);
-
-    useEffect(() => {
-        API_query_vortices("_size=max").then((data) => (setVortexData(data.rows)));
-    }, []);
-
-    useEffect(() => {
-        if(vortex_data.length > 0) {
-            setLoading(false);
-        }
-    }, [vortex_data]);
-
-    return (
-        <div className="container m-0 grid grid-cols-5 gap-2">
-            <LoadingPage enabled={loading_enabled} text="Loading" />
-            <FilteredVortexData.Provider value={{ filtered_vortex_data: filtered_vortex_data, setFilteredVortexData: setFilteredVortexData }}>
-                <VortexData.Provider value={{ vortex_data: vortex_data, setVortexData: setVortexData }}>
-                    <Sidebar />
-                </VortexData.Provider>
-                <ExplorerResults />
-            </FilteredVortexData.Provider>
-        </div >
-    )
-}
-
-const setMinMax = (data) => {
-    const minValue = Math.min(...data);
-    const maxValue = Math.max(...data);
-    return {
-        minValue: minValue, maxValue: maxValue, currentMin: minValue, currentMax: maxValue
-    }
-}
-
-const compareMinMax = (val, range) => (
-    ((val >= range.currentMin) && (val <= range.currentMax))
-)
-
-const Sidebar = ({ }) => {
+export default function Sidebar ({ }) {
     const { vortex_data } = useContext(VortexData);
     const { _, setFilteredVortexData } = useContext(FilteredVortexData);
 
@@ -97,70 +51,6 @@ const Sidebar = ({ }) => {
                 <Checkbox key={'brown'} value={colors_checked.brown} text='Brown vortices' name='brown_vortices' onChange={(e) => setColorsChecked(prevState => ({ ...prevState, brown: !prevState.brown }))} />
                 <Checkbox key={'dark'} value={colors_checked.dark} text='Dark vortices' name='dark_vortices' onChange={(e) => setColorsChecked(prevState => ({ ...prevState, dark: !prevState.dark }))} />
             </div>
-        </div>
-    )
-}
-
-const ExplorerResults = ({ }) => {
-    const { filtered_vortex_data, _ } = useContext(FilteredVortexData)
-
-    const page_size = 64;
-    const [display_vortices, setDisplayVortices] = useState([]);
-    const [n_pages, setNPages] = useState(0);
-    const [page, setPage] = useState(0);
-
-    useEffect(() => {
-        setNPages(Math.ceil(filtered_vortex_data.length / page_size));
-    }, [filtered_vortex_data]);
-
-    useEffect(() => {
-        if (filtered_vortex_data.length > 0) {
-            setDisplayVortices(
-                filtered_vortex_data.slice(page * page_size, (page + 1) * page_size)
-            );
-        }
-    }, [page, n_pages]);
-
-    const nextPage = () => {
-        setPage(Math.min(n_pages - 1, page + 1));
-    }
-
-    const prevPage = () => {
-        setPage(Math.max(0, page - 1));
-    }
-
-    return (
-        <div className="p-2 col-span-4">
-            <div className="flex flex-row flex-nowrap justify-center my-4 items-center align-middle [&>*]:mx-4">
-                <button onClick={() => prevPage()} className="w-8 h-8 bg-secondary-400 hover:bg-secondary-700">&laquo;</button>
-                <span className="h-8 flex items-center align-middle">Page: {page + 1} of {n_pages}</span>
-                <button onClick={() => nextPage()} className="w-8 h-8 bg-secondary-400 hover:bg-secondary-700">&raquo;</button>
-            </div>
-            <div className="grid grid-cols-8 gap-2" key={display_vortices.length}>
-                {display_vortices.map((vortex) => (
-                    <VortexSample key={vortex.id} vortex={vortex} />
-                ))}
-            </div>
-        </div>
-    )
-}
-
-
-const VortexSample = ({ vortex }) => {
-    const [ellipse_path, setEllipsePath] = useState([{ x: 192, y: 192, rx: 30, ry: 30, angle: 0 }]);
-
-    useEffect(() => {
-        API_query_subjects("subject_id=" + vortex.closest_subject_id).then((subject_data) => {
-            const position = lonlat_to_pixel(-vortex.lon, vortex.lat, 192, 192, subject_data[0].longitude, subject_data[0].latitude);
-            setEllipsePath([{ x: 384 - position[0], y: position[1], rx: vortex.rx, ry: vortex.ry, angle: vortex.angle, color: vortex.color }]);
-        });
-    }, [vortex]);
-
-    return (
-        <div>
-            <Link to={'/vortex/' + vortex.id} target='_blank' rel="noopener noreferrer" className="text-primary-800 hover:text-primary-300 hover:[&>div]:bg-primary-600">
-                <Subject subject_id={vortex.closest_subject_id} extracts={ellipse_path} title={"Vortex: " + vortex.id} />
-            </Link>
         </div>
     )
 }

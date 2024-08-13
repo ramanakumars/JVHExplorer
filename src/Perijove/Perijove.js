@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
-import { API_query_vortices } from "./API";
-import { VortexEllipse } from "./shape_utils";
+import { API_query_vortices } from "../API";
+import VortexEllipse from "../ShapeUtils/VortexEllipse";
 
 export default function Perijove({ perijove }) {
     const [vortices, setVortices] = useState([]);
@@ -19,6 +19,7 @@ export default function Perijove({ perijove }) {
                     center={[0, 0]}
                     zoom={2}
                     scrollWheelZoom={true}
+                    worldCopyJump={true}
                 >
                     <TileLayer
                         minZoom={0}
@@ -28,7 +29,7 @@ export default function Perijove({ perijove }) {
                     />
 
                     {vortices.map((vortex) => (
-                        <VortexEllipse vortex={vortex} key={vortex.id} />
+                        <VortexEllipse vortex={vortex} key={vortex.id} opacity={0.5}/>
                     ))}
                 </MapContainer>
             </div>
