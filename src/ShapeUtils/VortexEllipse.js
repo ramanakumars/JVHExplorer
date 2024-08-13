@@ -2,7 +2,7 @@ import { get_points, convert_to_lonlat, round, radians, colors } from "./GeoUtil
 import { Link } from "react-router-dom";
 import { Polygon, Popup } from "react-leaflet";
 
-export default function VortexEllipse ({ vortex, opacity=0.3 }) {
+export default function VortexEllipse({ vortex, opacity }) {
     var loni = 360 - vortex.lon;
     if (loni < -180) {
         loni += 360;
@@ -23,8 +23,9 @@ export default function VortexEllipse ({ vortex, opacity=0.3 }) {
             lon0={loni}
             lat0={vortex.lat}
             color={colors[vortex.color]}
+            opacity={opacity}
         >
-            <VortexPopup vortex={vortex} opacity={opacity}/>
+            <VortexPopup vortex={vortex} />
         </Ellipse>
     );
 };

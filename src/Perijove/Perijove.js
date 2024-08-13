@@ -28,7 +28,7 @@ export default function Perijove({ perijove }) {
                     />
 
                     {vortices.map((vortex) => (
-                        <VortexEllipse vortex={vortex} key={vortex.id} />
+                        <VortexEllipse vortex={vortex} key={vortex.id} opacity={0.5}/>
                     ))}
                 </MapContainer>
             </div>
