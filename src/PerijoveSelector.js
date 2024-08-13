@@ -40,7 +40,7 @@ const Card = ({ perijove }) => {
             style={{ "backgroundImage": "url('/PJs/PJimgs/PJ" + perijove.perijove + "/globe_mosaic.png')"}}
             to={"/perijove/" + perijove.perijove}
         >
-            <span className="w-fulf">PJ {perijove.perijove}</span>
+            <span className="w-full">PJ {perijove.perijove}</span>
             <span># of vortices: {perijove.num_vortices}</span>
         </Link>
     );
