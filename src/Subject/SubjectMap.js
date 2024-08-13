@@ -7,6 +7,7 @@ import { API_query_extracts, API_query_vortices } from "../API";
 
 export default function SubjectMap({ subject_id, subject_metadata }) {
     const [show_vortices, setShowVortices] = useState(false);
+    const [show_extracts, setShowExtracts] = useState(false);
     const [vortices, setVortices] = useState([]);
     const [extracts, setExtracts] = useState([]);
 
@@ -16,7 +17,11 @@ export default function SubjectMap({ subject_id, subject_metadata }) {
     const edge_lonlat = edge_pixels.map((pixel) => convert_to_lonlat(pixel[0], pixel[1], subject_metadata.longitude, subject_metadata.latitude));
 
     useEffect(() => {
-        API_query_extracts("subject_id=" + subject_id).then((data) => (setExtracts(data.rows)));
+        API_query_extracts("subject_id=" + subject_id).then((data) => (
+            setExtracts(data.rows.map((row) => {
+                return { ...row, x: 192 - row.x, y: row.y - 192, lon: 360 - subject_metadata.longitude, lat: subject_metadata.latitude, id: row.vortex};
+            }))
+        ));
     }, [subject_id]);
 
     useEffect(() => {
@@ -35,9 +40,10 @@ export default function SubjectMap({ subject_id, subject_metadata }) {
                 scrollWheelZoom={true}
                 className="!h-[800px]"
             >
-                { (vortices.length > 0) &&
-                    <div className="absolute text-white right-10 top-10 bg-slate-500 z-[500] px-2 text-lg" >
+                {(vortices.length > 0) &&
+                    <div className="w-96 absolute text-white right-10 top-10 bg-slate-500 z-[500] px-2 text-lg" >
                         <Checkbox value={show_vortices} text={"Show vortices"} name={"vortices"} onChange={(e) => setShowVortices(!show_vortices)} />
+                        <Checkbox value={show_extracts} text={"Show classifications"} name={"extracts"} onChange={(e) => setShowExtracts(!show_extracts)} />
                     </div>
                 }
 
@@ -51,7 +57,13 @@ export default function SubjectMap({ subject_id, subject_metadata }) {
 
                 {(show_vortices && (vortices.length > 0)) &&
                     vortices.map((vortex) => (
-                        <VortexEllipse vortex={vortex} key={vortex.id} opacity={0.8}/>
+                        <VortexEllipse vortex={vortex} key={vortex.id} opacity={0.8} />
+                    ))
+                }
+
+                {(show_extracts && (extracts.length > 0)) &&
+                    extracts.map((vortex) => (
+                        <VortexEllipse vortex={vortex} key={"extract_" + vortex.id} opacity={0.4} filled={false}/>
                     ))
                 }
 

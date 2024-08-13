@@ -1,8 +1,8 @@
 import { get_points, convert_to_lonlat, round, radians, colors } from "./GeoUtils";
 import { Link } from "react-router-dom";
-import { Polygon, Popup } from "react-leaflet";
+import { Polygon, Polyline, Popup } from "react-leaflet";
 
-export default function VortexEllipse({ vortex, opacity }) {
+export default function VortexEllipse({ vortex, opacity, filled=true }) {
     var loni = 360 - vortex.lon;
     if (loni < -180) {
         loni += 360;
@@ -24,23 +24,26 @@ export default function VortexEllipse({ vortex, opacity }) {
             lat0={vortex.lat}
             color={colors[vortex.color]}
             opacity={opacity}
+            filled={filled}
         >
             <VortexPopup vortex={vortex} />
         </Ellipse>
     );
 };
 
-const Ellipse = ({ ellipse_params, lon0, lat0, color, opacity, children }) => {
+const Ellipse = ({ ellipse_params, lon0, lat0, color, opacity, filled, children }) => {
     const points = get_points(ellipse_params);
+
+    const PathComponent = filled ? Polygon : Polyline;
 
     const positions = points.map((point) =>
         convert_to_lonlat(point[0], point[1], lon0, lat0)
     );
 
     return (
-        <Polygon positions={positions} pathOptions={{ color: color }} opacity={opacity}>
+        <PathComponent positions={positions} pathOptions={{ color: color }} opacity={opacity} weight={2}>
             {children}
-        </Polygon>
+        </PathComponent>
     );
 }
 
