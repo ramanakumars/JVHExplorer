@@ -23,7 +23,7 @@ export const colors = {
 };
 
 export function get_points(ellipse_params) {
-    const N = 30;
+    const N = 50;
     const angles = [...Array(N).keys()].map(
         (number) => (number * 2 * Math.PI) / (N - 1)
     );
