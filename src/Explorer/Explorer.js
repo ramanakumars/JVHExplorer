@@ -44,7 +44,7 @@ export default function Explorer({ }) {
 
 
 const ExplorerResults = () => {
-    const [result_type, setResultType] = useState(ResultType.DATA_ONLY);
+    const [result_type, setResultType] = useState(ResultType.PLOT_ONLY);
 
     return (
         <div className="p-2 col-span-4">
@@ -52,10 +52,8 @@ const ExplorerResults = () => {
                 <Switch name="result_type" options={Object.entries(ResultType)} onChange={(e) => setResultType(ResultType[e])} selected={result_type}/>
             </div>
             <div className="w-full p-2">
-                { result_type == ResultType.DATA_ONLY ?
-                    <FilteredVortices /> :
-                    <PlotResults />
-                }
+                <FilteredVortices visible={result_type === ResultType.DATA_ONLY ? null : 'hidden'}/> :
+                <PlotResults visible={result_type === ResultType.PLOT_ONLY ? null : 'hidden'} />
             </div>
         </div>
     )
