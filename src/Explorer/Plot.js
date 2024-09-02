@@ -56,8 +56,8 @@ const Plot = ({ plot_type }) => {
 
 const PlotSidebar = ({ plot_type, setPlotVariables }) => {
     const { filtered_vortex_data, _ } = useContext(FilteredVortexData);
-    const [x, setX] = useState(null);
-    const [y, setY] = useState(null);
+    const [x, setX] = useState("");
+    const [y, setY] = useState("");
     const [variables, setVariables] = useState([]);
 
     useEffect(() => {
@@ -174,7 +174,7 @@ const Histogram = ({ plot_variables }) => {
                 <VictoryAxis dependentAxis label={"Count"}
                     axisLabelComponent={<VictoryLabel dy={-18} />}
                     fixLabelOverlap={true} />
-                <VictoryAxis label={plot_variables.x} />
+                <VictoryAxis label={plottable_variables[plot_variables.x].name} />
             </VictoryChart>
         )
     }
