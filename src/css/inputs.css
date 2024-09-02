@@ -1,0 +1,31 @@
+.react-switch-container {
+    @apply flex flex-row w-fit justify-evenly align-middle items-center;
+}
+
+.react-switch:first-child {
+    @apply rounded-l-full;
+}
+
+.react-switch:last-child {
+    @apply rounded-r-full;
+}
+
+.react-switch {
+    @apply w-24 h-12 flex justify-center items-center p-0 cursor-pointer bg-primary-200;
+}
+
+.react-switch input[type=radio] {
+    @apply w-0 h-0 hidden;
+}
+
+.react-switch input[type=radio] ~ label {
+    @apply w-full text-center flex justify-center items-center p-0 no-underline;
+}
+
+.react-switch:hover {
+    @apply bg-primary-500;
+}
+
+.react-switch:has(> input[type=radio]:checked) {
+    @apply bg-primary-400;
+}

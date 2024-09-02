@@ -2,7 +2,7 @@ import { useContext, useState, useEffect } from "react";
 import { FilteredVortexData } from "./Explorer";
 import VortexSample from "./VortexSample";
 
-export default function ExplorerResults({ }) {
+export default function FilteredVortices({ }) {
     const { filtered_vortex_data, _ } = useContext(FilteredVortexData)
 
     const page_size = 64;
@@ -31,7 +31,7 @@ export default function ExplorerResults({ }) {
     }
 
     return (
-        <div className="p-2 col-span-4">
+        <div className="w-full p-0">
             <div className="flex flex-row flex-nowrap justify-center my-4 items-center align-middle [&>*]:mx-4">
                 <button onClick={() => prevPage()} className="w-8 h-8 bg-secondary-400 hover:bg-secondary-700">&laquo;</button>
                 <span className="h-8 flex items-center align-middle">Page: {page + 1} of {n_pages}</span>

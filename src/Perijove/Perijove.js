@@ -10,7 +10,7 @@ export default function Perijove({ perijove }) {
         API_query_vortices(
             "_size=max&num_extracts__gte=8&perijove=" + perijove
         ).then((data) => setVortices(data.rows));
-    }, []);
+    }, [perijove]);
 
     if (vortices.length > 0) {
         return (

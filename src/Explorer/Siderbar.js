@@ -2,7 +2,7 @@ import { InputMultiRange } from "../Inputs/InputMultiRange";
 import { Checkbox } from "../Inputs/Checkbox";
 import { useState, useContext, useEffect } from "react";
 import { VortexData, FilteredVortexData } from "./Explorer";
-import { setMinMax, compareMinMax } from "./MinMax";
+import { setMinMax, compareMinMax } from "../ShapeUtils/MinMax";
 
 export default function Sidebar ({ }) {
     const { vortex_data } = useContext(VortexData);
