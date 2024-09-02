@@ -29,7 +29,7 @@ export default function Select({ id, var_name, variables, onChange, value }) {
 				</option>
 				{variables.map((vi) => (
 					<option
-						value={vi.name}
+						value={vi.id}
 						key={var_name + "_" + vi.name + "_label"}
 					>
 						{vi.name}
