@@ -1,10 +1,11 @@
-import { useState, useEffect, useContext, createContext } from "react";
+import { useState, useEffect, useContext, createContext, createElement } from "react";
 import { FilteredVortexData } from "./Explorer";
 import Select from "../Inputs/Select"
 import { VictoryAxis, VictoryChart, VictoryHistogram, VictoryLabel, VictoryScatter, VictoryTooltip } from "victory";
-import { ResponsiveScatterPlotCanvas } from "@nivo/scatterplot";
+import { ResponsiveScatterPlotCanvas, Node  } from "@nivo/scatterplot";
 import { Slider } from "../Inputs/Slider";
-import { redirect, useNavigate } from "react-router";
+import { useTooltip } from "@nivo/tooltip"
+import VortexPopup from "../ShapeUtils/VortexPopup";
 
 const plottable_variables = {
     angle: { name: "Angle [deg]", scale: 1 },
@@ -76,7 +77,6 @@ const PlotSidebar = ({ plot_type, setPlotVariables }) => {
     useEffect(() => {
         if (filtered_vortex_data.length > 0) {
             // loop over the metadata keys and find the minimum and maximum
-            console.log(filtered_vortex_data[0]);
             let variable_data = Object.keys(plottable_variables).map((variable) => {
                 console.log('Getting info for ' + variable);
                 let var_data = {};
@@ -220,6 +220,7 @@ const Scatter = ({ plot_variables }) => {
     const [data, setData] = useState([])
     const { filtered_vortex_data } = useContext(FilteredVortexData);
     const { PlotStyle } = useContext(PlotStyleContext);
+    const { showTooltipFromEvent, hideTooltip } = useTooltip();
 
     useEffect(() => {
         if ((plot_variables.x) && (plot_variables.y)) {
@@ -233,6 +234,12 @@ const Scatter = ({ plot_variables }) => {
             );
         }
     }, [plot_variables, filtered_vortex_data])
+
+    const tooltip = ({ node }) => (
+        <div className="p-2 rounded-xl border-2 border-primary-900 bg-white text-sm">
+            <VortexPopup vortex={filtered_vortex_data[node.index]} link_enabled={false}/>
+        </div>
+    )
 
     if (data.length > 0) {
         return (
@@ -255,6 +262,7 @@ const Scatter = ({ plot_variables }) => {
                     legendPosition: 'middle',
                     legendOffset: 40
                 }}
+                tooltip={(node) => tooltip(node)}
                 axisLeft={{
                     orient: 'left',
                     tickSize: 5,
@@ -264,35 +272,6 @@ const Scatter = ({ plot_variables }) => {
                     legendPosition: 'middle',
                     legendOffset: -40
                 }}
-                onClick={(node) => (redirect('/vortex/' + filtered_vortex_data[node.index].id))}
-                tooltip={({ node }) => (
-                    <div className="flex flex-col justify-between items-stretch p-2 rounded-xl border-2 border-primary-900 bg-white">
-                        <div className="w-full flex flex-row justify-center items-center [&>span]:px-2">
-                            <span className="text-right">
-                                {plottable_variables[plot_variables.x].name}:
-                            </span>
-                            <span>
-                                {node.formattedX}
-                            </span>
-                        </div>
-                        <div className="w-full flex justify-center [&>span]:px-2">
-                            <span className="text-right">
-                                {plottable_variables[plot_variables.y].name}:
-                            </span>
-                            <span>
-                                {node.formattedY}
-                            </span>
-                        </div>
-                        <div className="w-full flex justify-center [&>span]:px-2">
-                            <span className="text-right">
-                                Vortex ID:
-                            </span>
-                            <span>
-                                {filtered_vortex_data[node.index].id}
-                            </span>
-                        </div>
-                    </div>
-                )}
             />
         )
     }
