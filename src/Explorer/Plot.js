@@ -2,6 +2,7 @@ import { useState, useEffect, useContext, createContext } from "react";
 import { FilteredVortexData } from "./Explorer";
 import Select from "../Inputs/Select"
 import { VictoryAxis, VictoryChart, VictoryHistogram, VictoryLabel, VictoryScatter, VictoryTooltip } from "victory";
+import { ResponsiveScatterPlotCanvas } from "@nivo/scatterplot";
 import { Slider } from "../Inputs/Slider";
 
 const plottable_variables = {
@@ -40,7 +41,7 @@ const Plot = ({ plot_type }) => {
     const [plot_variables, setPlotVariables] = useState({});
     const [PlotStyle, setPlotStyle] = useState({
         scatter: {
-            size: 1,
+            size: 5,
             opacity: 1.0
         }
     });
@@ -189,81 +190,124 @@ const Scatter = ({ plot_variables }) => {
     useEffect(() => {
         if ((plot_variables.x) && (plot_variables.y)) {
             setData(
-                filtered_vortex_data.map((dati) => (
-                    { x: dati[plot_variables.x] * plottable_variables[plot_variables.x].scale, y: dati[plot_variables.y] * plottable_variables[plot_variables.y].scale }
-                ))
+                [{
+                    id: plottable_variables[plot_variables.y].name,
+                    data: filtered_vortex_data.map((dati) => (
+                        { x: dati[plot_variables.x] * plottable_variables[plot_variables.x].scale, y: dati[plot_variables.y] * plottable_variables[plot_variables.y].scale }
+                    ))
+                }]
             );
         }
     }, [plot_variables, filtered_vortex_data])
 
     if (data.length > 0) {
         return (
-            <VictoryChart domainPadding={30} padding={{ left: 60, right: 20, top: 20, bottom: 60 }}>
-                <VictoryScatter data={data} style={{ data: { fill: 'red', opacity: PlotStyle.scatter.opacity } }} size={PlotStyle.scatter.size} />
-                <VictoryAxis
-                    dependentAxis
-                    label={plottable_variables[plot_variables.y].name}
-                    axisLabelComponent={<VictoryLabel dy={-16} />}
-                    fixLabelOverlap={true}
-                    style={{
-                        axisLabel: {
-                            fontFamily: "inherit",
-                            fontSize: 12
-                        },
-                        tickLabels: {
-                            fontFamily: "inherit",
-                            fontSize: 12
-                        }
-                    }}
-                />
-                <VictoryAxis
-                    label={plottable_variables[plot_variables.x].name}
-                    style={{
-                        axisLabel: {
-                            fontSize: 12
-                        },
-                        tickLabels: {
-                            fontSize: 12
-                        }
-                    }}
-                    orientation="bottom"
-                    offsetY={60}
-                />
-            </VictoryChart>
+            <ResponsiveScatterPlotCanvas
+                data={data}
+                margin={{ top: 20, right: 20, bottom: 50, left: 90 }}
+                xScale={{ type: 'linear', min: 'auto', max: 'auto' }}
+                xFormat=">-.2f"
+                yScale={{ type: 'linear', min: 'auto', max: 'auto' }}
+                yFormat=">-.2f"
+                nodeSize={Number(PlotStyle.scatter.size)}
+                axisTop={null}
+                axisRight={null}
+                axisBottom={{
+                    orient: 'bottom',
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    legend: plottable_variables[plot_variables.x].name,
+                    legendPosition: 'middle',
+                    legendOffset: 40
+                }}
+                axisLeft={{
+                    orient: 'left',
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    legend: plottable_variables[plot_variables.y].name,
+                    legendPosition: 'middle',
+                    legendOffset: -40
+                }}
+                tooltip={({node}) => (
+                    <div className="flex flex-col justify-between items-stretch p-2 rounded-xl border-2 border-primary-900 bg-white">
+                        <div className="w-full flex flex-row justify-center items-center">
+                            <span className="text-right">
+                                {plottable_variables[plot_variables.x].name}:
+                            </span>
+                            <span>
+                                {node.formattedX}
+                            </span>
+                        </div>
+                        <div className="w-full flex justify-center">
+                            <span className="text-right">
+                                {plottable_variables[plot_variables.y].name}:
+                            </span>
+                            <span>
+                                {node.formattedY}
+                            </span>
+                        </div>
+                    </div>
+                )}
+            />
+
+            // <VictoryChart domainPadding={30} padding={{ left: 60, right: 20, top: 20, bottom: 60 }}>
+            //     <VictoryScatter data={data} style={{ data: { fill: 'red', opacity: PlotStyle.scatter.opacity } }} size={PlotStyle.scatter.size} />
+            //     <VictoryAxis
+            //         dependentAxis
+            //         label={plottable_variables[plot_variables.y].name}
+            //         axisLabelComponent={<VictoryLabel dy={-16} />}
+            //         fixLabelOverlap={true}
+            //         style={{
+            //             axisLabel: {
+            //                 fontFamily: "inherit",
+            //                 fontSize: 12
+            //             },
+            //             tickLabels: {
+            //                 fontFamily: "inherit",
+            //                 fontSize: 12
+            //             }
+            //         }}
+            //     />
+            //     <VictoryAxis
+            //         label={plottable_variables[plot_variables.x].name}
+            //         style={{
+            //             axisLabel: {
+            //                 fontSize: 12
+            //             },
+            //             tickLabels: {
+            //                 fontSize: 12
+            //             }
+            //         }}
+            //         orientation="bottom"
+            //         offsetY={60}
+            //     />
+            // </VictoryChart>
         )
     }
 }
 
 const ScatterPlotStyle = () => {
-    const [marker_size, setMarkerSize] = useState(1);
-    const [opacity, setOpacity] = useState(1.0);
+    const [marker_size, setMarkerSize] = useState(5);
     const { PlotStyle, setPlotStyle } = useContext(PlotStyleContext);
 
     useEffect(() => {
         if (marker_size) {
-            setPlotStyle({ ...PlotStyle, scatter: { ...PlotStyle.scatter, size: marker_size, opacity: opacity } });
+            setPlotStyle({ ...PlotStyle, scatter: { ...PlotStyle.scatter, size: marker_size } });
         }
-    }, [marker_size, opacity]);
+    }, [marker_size]);
 
     return (
         <div className="w-full p-2 flex flex-col justify-start items-stretch">
             <Slider
                 minValue={1}
-                maxValue={5}
+                maxValue={15}
                 value={marker_size}
                 text={'Marker size'}
                 type={'int'}
                 name={'marker_size'}
                 onChange={setMarkerSize}
-            />
-            <Slider
-                minValue={0}
-                maxValue={1}
-                value={opacity}
-                text={'Opacity'}
-                type={'float'}
-                name={'opacity'}
-                onChange={setOpacity}
             />
         </div>
     )
