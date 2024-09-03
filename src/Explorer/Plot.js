@@ -4,6 +4,7 @@ import Select from "../Inputs/Select"
 import { VictoryAxis, VictoryChart, VictoryHistogram, VictoryLabel, VictoryScatter, VictoryTooltip } from "victory";
 import { ResponsiveScatterPlotCanvas } from "@nivo/scatterplot";
 import { Slider } from "../Inputs/Slider";
+import { redirect, useNavigate } from "react-router";
 
 const plottable_variables = {
     angle: { name: "Angle [deg]", scale: 1 },
@@ -139,7 +140,7 @@ const PlotSidebar = ({ plot_type, setPlotVariables }) => {
 
 const Chart = ({ plot_variables, plot_type }) => {
     return (
-        <div className="w-full col-span-3 p-4">
+        <div className="w-full col-span-3 p-0">
             {
                 plot_type === 'histogram' && <Histogram plot_variables={plot_variables} />
             }
@@ -152,7 +153,8 @@ const Chart = ({ plot_variables, plot_type }) => {
 
 const Histogram = ({ plot_variables }) => {
     const [data, setData] = useState([])
-    const { filtered_vortex_data, _ } = useContext(FilteredVortexData);
+    const { filtered_vortex_data } = useContext(FilteredVortexData);
+    const { PlotStyle } = useContext(PlotStyleContext)
 
     useEffect(() => {
         if ((plot_variables.x)) {
@@ -166,7 +168,10 @@ const Histogram = ({ plot_variables }) => {
 
     if (data.length > 0) {
         return (
-            <VictoryChart domainPadding={30} padding={{ left: 60, right: 20, top: 20, bottom: 60 }}>
+            <VictoryChart
+                domainPadding={30} padding={{ left: 60, right: 20, top: 20, bottom: 60 }}
+                scale={{ x: PlotStyle.histogram.xscale, y: PlotStyle.histogram.yscale }}
+            >
                 <VictoryHistogram
                     data={data}
                     labels={({ datum }) => (["(" + datum.x + " - " + datum.x1 + ")", "Count: " + datum.y])}
@@ -174,12 +179,41 @@ const Histogram = ({ plot_variables }) => {
                 />
                 <VictoryAxis dependentAxis label={"Count"}
                     axisLabelComponent={<VictoryLabel dy={-18} />}
-                    fixLabelOverlap={true} />
+                    fixLabelOverlap={true}
+                />
                 <VictoryAxis label={plottable_variables[plot_variables.x].name} />
             </VictoryChart>
         )
     }
+}
 
+const HistogramPlotStyle = () => {
+    const [xscale, setXScale] = useState('linear');
+    const [yscale, setYScale] = useState('linear');
+    const { PlotStyle, setPlotStyle } = useContext(PlotStyleContext);
+
+    useEffect(() => {
+        setPlotStyle({ ...PlotStyle, histogram: { xscale: xscale, yscale: yscale } });
+    }, [xscale, yscale]);
+
+    return (
+        <div className="w-full p-2 flex flex-col justify-start items-stretch">
+            <Select
+                id={'xscale'}
+                var_name={'x-axis scale'}
+                variables={[{ id: 'linear', name: "Linear" }, { id: 'log', name: 'Log' }]}
+                value={xscale}
+                onChange={setXScale}
+            />
+            <Select
+                id={'yscale'}
+                var_name={'y-axis scale'}
+                variables={[{ id: 'linear', name: "Linear" }, { id: 'log', name: 'Log' }]}
+                value={yscale}
+                onChange={setYScale}
+            />
+        </div>
+    )
 }
 
 const Scatter = ({ plot_variables }) => {
@@ -205,9 +239,9 @@ const Scatter = ({ plot_variables }) => {
             <ResponsiveScatterPlotCanvas
                 data={data}
                 margin={{ top: 20, right: 20, bottom: 50, left: 90 }}
-                xScale={{ type: 'linear', min: 'auto', max: 'auto' }}
+                xScale={{ type: PlotStyle.scatter.xscale, min: 'auto', max: 'auto' }}
                 xFormat=">-.2f"
-                yScale={{ type: 'linear', min: 'auto', max: 'auto' }}
+                yScale={{ type: PlotStyle.scatter.yscale, min: 'auto', max: 'auto' }}
                 yFormat=">-.2f"
                 nodeSize={Number(PlotStyle.scatter.size)}
                 axisTop={null}
@@ -230,9 +264,10 @@ const Scatter = ({ plot_variables }) => {
                     legendPosition: 'middle',
                     legendOffset: -40
                 }}
-                tooltip={({node}) => (
+                onClick={(node) => (redirect('/vortex/' + filtered_vortex_data[node.index].id))}
+                tooltip={({ node }) => (
                     <div className="flex flex-col justify-between items-stretch p-2 rounded-xl border-2 border-primary-900 bg-white">
-                        <div className="w-full flex flex-row justify-center items-center">
+                        <div className="w-full flex flex-row justify-center items-center [&>span]:px-2">
                             <span className="text-right">
                                 {plottable_variables[plot_variables.x].name}:
                             </span>
@@ -240,7 +275,7 @@ const Scatter = ({ plot_variables }) => {
                                 {node.formattedX}
                             </span>
                         </div>
-                        <div className="w-full flex justify-center">
+                        <div className="w-full flex justify-center [&>span]:px-2">
                             <span className="text-right">
                                 {plottable_variables[plot_variables.y].name}:
                             </span>
@@ -248,55 +283,32 @@ const Scatter = ({ plot_variables }) => {
                                 {node.formattedY}
                             </span>
                         </div>
+                        <div className="w-full flex justify-center [&>span]:px-2">
+                            <span className="text-right">
+                                Vortex ID:
+                            </span>
+                            <span>
+                                {filtered_vortex_data[node.index].id}
+                            </span>
+                        </div>
                     </div>
                 )}
             />
-
-            // <VictoryChart domainPadding={30} padding={{ left: 60, right: 20, top: 20, bottom: 60 }}>
-            //     <VictoryScatter data={data} style={{ data: { fill: 'red', opacity: PlotStyle.scatter.opacity } }} size={PlotStyle.scatter.size} />
-            //     <VictoryAxis
-            //         dependentAxis
-            //         label={plottable_variables[plot_variables.y].name}
-            //         axisLabelComponent={<VictoryLabel dy={-16} />}
-            //         fixLabelOverlap={true}
-            //         style={{
-            //             axisLabel: {
-            //                 fontFamily: "inherit",
-            //                 fontSize: 12
-            //             },
-            //             tickLabels: {
-            //                 fontFamily: "inherit",
-            //                 fontSize: 12
-            //             }
-            //         }}
-            //     />
-            //     <VictoryAxis
-            //         label={plottable_variables[plot_variables.x].name}
-            //         style={{
-            //             axisLabel: {
-            //                 fontSize: 12
-            //             },
-            //             tickLabels: {
-            //                 fontSize: 12
-            //             }
-            //         }}
-            //         orientation="bottom"
-            //         offsetY={60}
-            //     />
-            // </VictoryChart>
         )
     }
 }
 
 const ScatterPlotStyle = () => {
     const [marker_size, setMarkerSize] = useState(5);
+    const [xscale, setXScale] = useState('linear');
+    const [yscale, setYScale] = useState('linear');
     const { PlotStyle, setPlotStyle } = useContext(PlotStyleContext);
 
     useEffect(() => {
         if (marker_size) {
-            setPlotStyle({ ...PlotStyle, scatter: { ...PlotStyle.scatter, size: marker_size } });
+            setPlotStyle({ ...PlotStyle, scatter: { size: marker_size, xscale: xscale, yscale: yscale } });
         }
-    }, [marker_size]);
+    }, [marker_size, xscale, yscale]);
 
     return (
         <div className="w-full p-2 flex flex-col justify-start items-stretch">
@@ -309,17 +321,24 @@ const ScatterPlotStyle = () => {
                 name={'marker_size'}
                 onChange={setMarkerSize}
             />
+            <Select
+                id={'xscale'}
+                var_name={'x-axis scale'}
+                variables={[{ id: 'linear', name: "Linear" }, { id: 'log', name: 'Log' }]}
+                value={xscale}
+                onChange={setXScale}
+            />
+            <Select
+                id={'yscale'}
+                var_name={'y-axis scale'}
+                variables={[{ id: 'linear', name: "Linear" }, { id: 'log', name: 'Log' }]}
+                value={yscale}
+                onChange={setYScale}
+            />
         </div>
     )
 }
 
-const HistogramPlotStyle = () => {
-    return (
-        <div>
-
-        </div>
-    )
-}
 
 
 export default Plot;
