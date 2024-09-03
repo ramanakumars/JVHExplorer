@@ -1,8 +1,8 @@
-import { useState, useEffect, useContext, createContext, createElement } from "react";
+import { useState, useEffect, useContext, createContext } from "react";
 import { FilteredVortexData } from "./Explorer";
 import Select from "../Inputs/Select"
-import { VictoryAxis, VictoryChart, VictoryHistogram, VictoryLabel, VictoryScatter, VictoryTooltip } from "victory";
-import { ResponsiveScatterPlotCanvas, Node  } from "@nivo/scatterplot";
+import { VictoryAxis, VictoryChart, VictoryHistogram, VictoryLabel, VictoryTooltip } from "victory";
+import { ResponsiveScatterPlotCanvas  } from "@nivo/scatterplot";
 import { Slider } from "../Inputs/Slider";
 import { useTooltip } from "@nivo/tooltip"
 import VortexPopup from "../ShapeUtils/VortexPopup";

@@ -52,7 +52,7 @@ const ExplorerResults = () => {
                 <Switch name="result_type" options={Object.entries(ResultType)} onChange={(e) => setResultType(ResultType[e])} selected={result_type}/>
             </div>
             <div className="w-full p-2">
-                <FilteredVortices visible={result_type === ResultType.DATA_ONLY ? null : 'hidden'}/> :
+                <FilteredVortices visible={result_type === ResultType.DATA_ONLY ? null : 'hidden'}/>
                 <PlotResults visible={result_type === ResultType.PLOT_ONLY ? null : 'hidden'} />
             </div>
         </div>
