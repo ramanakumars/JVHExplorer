@@ -20,7 +20,13 @@ export default function Explorer({ }) {
     const [loading_enabled, setLoading] = useState(true);
 
     useEffect(() => {
-        API_query_vortices("_size=max").then((data) => (setVortexData(data.rows)));
+        API_query_vortices("_size=max").then((data) => (setVortexData(
+            data.rows.map((vortex) => ({
+                ...vortex, 
+                aspect_ratio: Math.max(vortex.physical_width, vortex.physical_height) / Math.min(vortex.physical_height, vortex.physical_width),
+                size: Math.max(vortex.physical_width, vortex.physical_height)
+            }))
+        )));
     }, []);
 
     useEffect(() => {
