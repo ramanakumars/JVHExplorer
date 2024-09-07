@@ -1,11 +1,11 @@
 import { useState, useEffect, useContext, createContext } from "react";
 import { FilteredVortexData } from "./Explorer";
 import Select from "../Inputs/Select"
-import { VictoryAxis, VictoryChart, VictoryHistogram, VictoryLabel, VictoryTooltip } from "victory";
-import { ResponsiveScatterPlotCanvas  } from "@nivo/scatterplot";
+import { ResponsiveScatterPlotCanvas } from "@nivo/scatterplot";
 import { Slider } from "../Inputs/Slider";
 import { useTooltip } from "@nivo/tooltip"
 import VortexPopup from "../ShapeUtils/VortexPopup";
+import Plot from "react-plotly.js";
 
 const plottable_variables = {
     angle: { name: "Angle [deg]", scale: 1 },
@@ -14,6 +14,10 @@ const plottable_variables = {
     lon: { name: "Sys III Longitude [deg]", scale: 1 },
     lat: { name: "Planetographic Latitude [deg]", scale: 1 },
     perijove: { name: "Perijove", scale: 1 },
+    aspect_ratio: { name: "Aspect Ratio", scale: 1},
+    size: { name: "Size [km]", scale: 0.001},
+    num_extracts: { name: "Number of extracts", scale: 1},
+    probability: { name: "Vortex Size Confidence [%]", scale: 100}
 }
 
 const PlotStyleContext = createContext({});
@@ -39,7 +43,7 @@ function checkInt(val) {
     return parseFloat(val) == intVal && !isNaN(intVal);
 }
 
-const Plot = ({ plot_type }) => {
+const PlotComponent = ({ plot_type }) => {
     const [plot_variables, setPlotVariables] = useState({});
     const [PlotStyle, setPlotStyle] = useState({
         scatter: {
@@ -154,7 +158,7 @@ const Chart = ({ plot_variables, plot_type }) => {
 const Histogram = ({ plot_variables }) => {
     const [data, setData] = useState([])
     const { filtered_vortex_data } = useContext(FilteredVortexData);
-    const { PlotStyle } = useContext(PlotStyleContext)
+    const { PlotStyle } = useContext(PlotStyleContext);
 
     useEffect(() => {
         if ((plot_variables.x)) {
@@ -168,49 +172,71 @@ const Histogram = ({ plot_variables }) => {
 
     if (data.length > 0) {
         return (
-            <VictoryChart
-                domainPadding={30} padding={{ left: 60, right: 20, top: 20, bottom: 60 }}
-                scale={{ x: PlotStyle.histogram.xscale, y: PlotStyle.histogram.yscale }}
-            >
-                <VictoryHistogram
-                    data={data}
-                    labels={({ datum }) => (["(" + datum.x + " - " + datum.x1 + ")", "Count: " + datum.y])}
-                    labelComponent={<VictoryTooltip constrainToVisibleArea />}
-                />
-                <VictoryAxis dependentAxis label={"Count"}
-                    axisLabelComponent={<VictoryLabel dy={-18} />}
-                    fixLabelOverlap={true}
-                />
-                <VictoryAxis label={plottable_variables[plot_variables.x].name} />
-            </VictoryChart>
+            <Plot
+                data={[{
+                    x: data.map((dati) => (Number(dati.x))),
+                    type: 'histogram',
+                    nbinsx: PlotStyle.histogram.numBins
+                }]}
+                layout={{
+                    xaxis: {
+                        title: plottable_variables[plot_variables.x].name
+                    },
+                    yaxis: {
+                        title: "Count",
+                        type: PlotStyle.histogram.yscale
+                    },
+                    responsive: true,
+                    font: {
+                        family: 'Material, Arial'
+                    },
+                    margin: {
+                        l: 50,
+                        r: 20,
+                        b: 50,
+                        t: 20,
+                        pad: 4
+                    },
+                }}
+                config={{
+                    responsive: true
+                }}
+                style={{
+                    width: "100%",
+                    height: "100%",
+                }}
+                useResizeHandler={true}
+            />
         )
     }
 }
 
 const HistogramPlotStyle = () => {
-    const [xscale, setXScale] = useState('linear');
     const [yscale, setYScale] = useState('linear');
+    const [numBins, setNumBins] = useState(20);
     const { PlotStyle, setPlotStyle } = useContext(PlotStyleContext);
 
     useEffect(() => {
-        setPlotStyle({ ...PlotStyle, histogram: { xscale: xscale, yscale: yscale } });
-    }, [xscale, yscale]);
+        setPlotStyle({ ...PlotStyle, histogram: { yscale: yscale, numBins: Number(numBins) } });
+    }, [yscale, numBins]);
 
     return (
         <div className="w-full p-2 flex flex-col justify-start items-stretch">
-            <Select
-                id={'xscale'}
-                var_name={'x-axis scale'}
-                variables={[{ id: 'linear', name: "Linear" }, { id: 'log', name: 'Log' }]}
-                value={xscale}
-                onChange={setXScale}
-            />
             <Select
                 id={'yscale'}
                 var_name={'y-axis scale'}
                 variables={[{ id: 'linear', name: "Linear" }, { id: 'log', name: 'Log' }]}
                 value={yscale}
                 onChange={setYScale}
+            />
+            <Slider
+                minValue={5}
+                maxValue={150}
+                name={"num_bins"}
+                text={"Number of bins"}
+                type={"int"}
+                onChange={setNumBins}
+                value={numBins}
             />
         </div>
     )
@@ -220,7 +246,6 @@ const Scatter = ({ plot_variables }) => {
     const [data, setData] = useState([])
     const { filtered_vortex_data } = useContext(FilteredVortexData);
     const { PlotStyle } = useContext(PlotStyleContext);
-    const { showTooltipFromEvent, hideTooltip } = useTooltip();
 
     useEffect(() => {
         if ((plot_variables.x) && (plot_variables.y)) {
@@ -237,7 +262,7 @@ const Scatter = ({ plot_variables }) => {
 
     const tooltip = ({ node }) => (
         <div className="p-2 rounded-xl border-2 border-primary-900 bg-white text-sm">
-            <VortexPopup vortex={filtered_vortex_data[node.index]} link_enabled={false}/>
+            <VortexPopup vortex={filtered_vortex_data[node.index]} link_enabled={false} />
         </div>
     )
 
@@ -320,4 +345,4 @@ const ScatterPlotStyle = () => {
 
 
 
-export default Plot;
+export default PlotComponent;

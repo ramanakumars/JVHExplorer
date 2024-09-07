@@ -4,7 +4,7 @@ import { RxCross2 } from "react-icons/rx"
 import { GiHistogram } from "react-icons/gi"
 import { PiChartScatterLight } from "react-icons/pi"
 import { IconContext } from "react-icons/lib";
-import Plot from "./Plot"
+import PlotComponent from "./PlotComponent"
 
 export default function PlotResults({ visible }) {
     const [plots, setPlots] = useState([]);
@@ -57,11 +57,11 @@ const PlotContainer = ({ id, onClose }) => {
                     <RxCross2 className="w-full h-4" />
                 </button>
             </div>
-            <div className="w-full p-2 min-h-96 flex flex-row justify-center items-stretch">
+            <div className="w-full p-2 min-h-[20rem] flex flex-row justify-center items-stretch">
                 {(!plot_type) ?
                     <ChoosePlotType onChange={setPlotType} />
                     :
-                    <Plot plot_type={plot_type} />
+                    <PlotComponent plot_type={plot_type} />
                 }
             </div>
         </div>
