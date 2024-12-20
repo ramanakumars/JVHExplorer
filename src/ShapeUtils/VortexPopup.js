@@ -19,7 +19,7 @@ const VortexPopup = ({ vortex, link_enabled = true }) => {
             {
                 link_enabled &&
                 <span>
-                    <Link to={"/vortex/" + vortex.id}>See more</Link>
+                    <Link to={"/vortex/" + vortex.id} target="_blank" rel="no-referrer">See more</Link>
                 </span>
             }
         </div>
