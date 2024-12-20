@@ -3,7 +3,7 @@ import { API_query_vortices } from "../API";
 import Sidebar from "./Siderbar";
 import FilteredVortices from "./FilteredVortices";
 import { LoadingPage } from "../LoadingPage";
-import PlotResults from "./PlotResults";
+import PlotResults from "./Plotting/PlotResults";
 import Switch from "../Inputs/Switch";
 
 const ResultType = Object.freeze({
