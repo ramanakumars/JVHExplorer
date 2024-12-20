@@ -5,6 +5,7 @@ import { Histogram, HistogramPlotStyle } from "./Histogram";
 import PlotStyle from "./PlotStyle";
 import Select from "../../Inputs/Select"
 import plottable_variables from "./PlottableVariables";
+// import PlotComponent from "./PlotComponent";
 
 
 // from https://stackoverflow.com/questions/12467542/how-can-i-check-if-a-string-is-a-float
@@ -28,7 +29,7 @@ function checkInt(val) {
     return parseFloat(val) == intVal && !isNaN(intVal);
 }
 
-const Plot = ({ plot_type }) => {
+const PlotComponent = ({ plot_type }) => {
     const [plot_variables, setPlotVariables] = useState({});
     return (
         <div className="w-full grid grid-cols-4">
@@ -136,4 +137,4 @@ const Chart = ({ plot_variables, plot_type }) => {
 
 
 
-export default Plot;
+export default PlotComponent;
