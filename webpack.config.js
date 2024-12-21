@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const ENV_TYPE = process.env.TYPE;
 const PUBLIC_URL = ENV_TYPE === 'development' ? '/' : '/jvhexplorer';
+const DATA_URL = ENV_TYPE == "development" ? 'http://localhost:8001' : 'https://jvhexplorer-data-v4dvgredga-uc.a.run.app'
 
 console.log(ENV_TYPE)
 
@@ -69,7 +70,7 @@ module.exports = {
     proxy: [
       {
         context: ["/vortices"],
-        target: "https://jvhexplorer-data-v4dvgredga-uc.a.run.app",
+        target: DATA_URL,
         changeOrigin: true,
         logLevel: "debug",
       },
@@ -88,7 +89,7 @@ module.exports = {
      * resolve the one with the extension listed first in the array and skip the rest.
      * This is what enables users to leave off the extension when importing
      */
-    extensions: [".js", ".jsx", ".json", ".css"],
+    extensions: [".js", ".jsx", ".json", ".css", ".tsx", ".ts"],
   },
   module: {
     /** "rules"
@@ -99,9 +100,14 @@ module.exports = {
      */
     rules: [
       {
-        test: /\.(js|jsx)$/, //kind of file extension this rule should look for and apply in test
+        test: /\.(js|jsx|ts|tsx)$/, //kind of file extension this rule should look for and apply in test
         exclude: /node_modules/, //folder to be excluded
         use: "babel-loader", //loader which we are going to use
+      },
+      {
+        test: /\.(ts|tsx)$/,
+        exclude: /node_modules/,
+        use: "ts-loader",
       },
       {
         test: /\.(css)$/,
