@@ -1,7 +1,12 @@
-import React, { forwardRef, useImperativeHandle, useState } from "react";
+import React, { FC } from "react";
 import "./css/loading.css";
 
-export const LoadingPage = ({ enabled, text }) => {
+interface LoadingPageProps {
+  enabled: boolean;
+  text: string;
+}
+
+export const LoadingPage: FC<LoadingPageProps> = ({ enabled, text }) => {
   if (!enabled) {
     return <div className="not-loading">&nbsp;</div>;
   } else {

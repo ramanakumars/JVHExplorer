@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react"
-import { API_query_vortices } from "../API";
+import { API_query_vortices } from "../API/API";
 import Sidebar from "./Siderbar";
 import FilteredVortices from "./FilteredVortices";
 import { LoadingPage } from "../LoadingPage";

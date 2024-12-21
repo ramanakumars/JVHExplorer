@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
-import { API_query_vortices } from "../API";
+import { API_query_vortices } from "../API/API";
 import VortexEllipse from "../ShapeUtils/VortexEllipse";
 
 export default function Perijove({ perijove }) {

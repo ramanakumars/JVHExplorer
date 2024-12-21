@@ -1,4 +1,4 @@
-import { API_query_subject_image } from "../API";
+import { API_query_subject_image } from "../API/API";
 import { useState, useEffect, useContext } from "react";
 import { SubjectMosaic } from "./SubjectMosaic";
 import { SubjectMetadata } from "./SubjectMetadata";

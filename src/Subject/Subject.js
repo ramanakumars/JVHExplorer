@@ -1,6 +1,6 @@
 import React, { createContext } from "react";
 import { useEffect, useState } from "react"
-import { API_query_subjects } from "../API";
+import { API_query_subjects } from "../API/API";
 import SubjectInfo from "./SubjectInfo";
 import SubjectMap from "./SubjectMap";
 
