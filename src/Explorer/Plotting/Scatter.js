@@ -1,4 +1,3 @@
-import { ResponsiveScatterPlotCanvas } from "@nivo/scatterplot";
 import { Slider } from "../../Inputs/Slider";
 import VortexPopup from "../../ShapeUtils/VortexPopup";
 import { useState, useEffect, useContext } from "react";
@@ -6,12 +5,12 @@ import { FilteredVortexData } from "../Explorer";
 import plottable_variables from "./PlottableVariables";
 import { PlotStyleContext } from "./PlotStyle";
 import Select from "../../Inputs/Select"
+import Plot from "react-plotly.js";
 import { RxCross2 } from "react-icons/rx";
 
 export const Scatter = ({ plot_variables }) => {
     const [data, setData] = useState([])
     const [tooltip, setTooltip] = useState(null);
-    const [hoveredNodeId, setHoveredNodeId] = useState(null);
     const { filtered_vortex_data } = useContext(FilteredVortexData);
     const { PlotStyle } = useContext(PlotStyleContext);
 
@@ -28,71 +27,53 @@ export const Scatter = ({ plot_variables }) => {
         }
     }, [plot_variables, filtered_vortex_data])
 
-    const getTooltip = (node) => (
-        <VortexPopup vortex={filtered_vortex_data[node.index]} link_enabled={true} />
+    const getTooltip = (index) => (
+        <VortexPopup vortex={filtered_vortex_data[index]} link_enabled={true} />
     )
 
-    const handleClick = (node, event) => {
+    const handleClick = (data) => {
         setTooltip({
-            x: event.clientX,
-            y: event.clientY,
-            content: getTooltip(node)
+            x: data.event.clientX,
+            y: data.event.clientY,
+            content: getTooltip(data.points[0].pointNumber)
         })
     }
-
-    const handleMouseEnter = (node, event) => {
-        setHoveredNodeId(node.index); // Set the hovered node ID
-    };
-
-    const handleMouseLeave = () => {
-        setHoveredNodeId(null); // Reset the hovered node ID
-    };
 
     if (data.length > 0) {
         return (
             <>
-                <ResponsiveScatterPlotCanvas
-                    data={data}
-                    margin={{ top: 20, right: 20, bottom: 50, left: 90 }}
-                    xScale={{ type: PlotStyle.scatter.xscale, min: 'auto', max: 'auto' }}
-                    xFormat=">-.2f"
-                    yScale={{ type: PlotStyle.scatter.yscale, min: 'auto', max: 'auto' }}
-                    yFormat=">-.2f"
-                    nodeSize={Number(PlotStyle.scatter.size)}
-                    axisTop={null}
-                    axisRight={null}
-                    axisBottom={{
-                        orient: 'bottom',
-                        tickSize: 5,
-                        tickPadding: 5,
-                        tickRotation: 0,
-                        legend: plottable_variables[plot_variables.x].name,
-                        legendPosition: 'middle',
-                        legendOffset: 40
+                <Plot
+                    data={[
+                        {
+                            x: data[0].data.map((dati) => dati.x),
+                            y: data[0].data.map((dati) => dati.y),
+                            type: 'scattergl',
+                            mode: 'markers',
+                            marker: { size: Number(PlotStyle.scatter.size) },
+                            opacity: Number(PlotStyle.scatter.opacity)
+                        }
+                    ]}
+                    layout={{
+                        hovermode: "closest",
+                        responsive: true,
+                        useResizeHandler: true,
+                        autosize: true,
+                        width: '100%',
+                        height: '100%',
+                        xaxis: {
+                            title: {
+                                text: plottable_variables[plot_variables.x].name
+                            },
+                            type: PlotStyle.scatter.xscale
+                        },
+                        yaxis: {
+                            title: {
+                                text: plottable_variables[plot_variables.y].name
+                            },
+                            type: PlotStyle.scatter.yscale
+                        }
                     }}
                     onClick={handleClick}
-                    tooltip={() => <></>}
-                    // tooltip={(node) => tooltip(node)}
-                    axisLeft={{
-                        orient: 'left',
-                        tickSize: 5,
-                        tickPadding: 5,
-                        tickRotation: 0,
-                        legend: plottable_variables[plot_variables.y].name,
-                        legendPosition: 'middle',
-                        legendOffset: -40
-                    }}
-                    renderNode={(ctx, node) => {
-                        ctx.beginPath();
-                        ctx.arc(node.x, node.y, node.size / 2, 0, 2 * Math.PI);
-                        ctx.fillStyle = hoveredNodeId === node.index ? "red" : node.color;
-                        ctx.fill();
-                    }}
-                    onMouseEnter={handleMouseEnter} // Handle mouse enter
-                    onMouseLeave={handleMouseLeave} // Handle mouse leave
-                    enableZoom={true} // Enable zoom
-                    enablePan={true} // Enable panning
-                    isInteractive={true} // Ensure interaction is enabled
                 />
                 {tooltip && (
                     <div
@@ -117,15 +98,16 @@ export const Scatter = ({ plot_variables }) => {
 
 export const ScatterPlotStyle = () => {
     const [marker_size, setMarkerSize] = useState(5);
+    const [opacity, setOpacity] = useState(1);
     const [xscale, setXScale] = useState('linear');
     const [yscale, setYScale] = useState('linear');
     const { PlotStyle, setPlotStyle } = useContext(PlotStyleContext);
 
     useEffect(() => {
         if (marker_size) {
-            setPlotStyle({ ...PlotStyle, scatter: { size: marker_size, xscale: xscale, yscale: yscale } });
+            setPlotStyle({ ...PlotStyle, scatter: { size: marker_size, xscale: xscale, yscale: yscale, opacity: opacity } });
         }
-    }, [marker_size, xscale, yscale]);
+    }, [marker_size, xscale, yscale, opacity]);
 
     return (
         <div className="w-full p-2 flex flex-col justify-start items-stretch">
@@ -137,6 +119,15 @@ export const ScatterPlotStyle = () => {
                 type={'int'}
                 name={'marker_size'}
                 onChange={setMarkerSize}
+            />
+            <Slider
+                minValue={0}
+                maxValue={1}
+                value={opacity}
+                text={'Marker opacity'}
+                type={'float'}
+                name={'marker_opacity'}
+                onChange={setOpacity}
             />
             <Select
                 id={'xscale'}
