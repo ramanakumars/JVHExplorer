@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
-import { API_query_vortices } from "../API";
+import { API_query_vortices } from "../API/API";
 import VortexEllipse from "../ShapeUtils/VortexEllipse";
 
 export default function Perijove({ perijove }) {
@@ -10,7 +10,7 @@ export default function Perijove({ perijove }) {
         API_query_vortices(
             "_size=max&num_extracts__gte=8&perijove=" + perijove
         ).then((data) => setVortices(data.rows));
-    }, []);
+    }, [perijove]);
 
     if (vortices.length > 0) {
         return (

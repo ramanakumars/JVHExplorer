@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { API_query_extracts, API_query_vortices } from "./API";
+import { API_query_extracts, API_query_vortices } from "./API/API";
 import { LoadingPage } from "./LoadingPage";
 import SubjectImage from "./SubjectImage";
 import { Link } from "react-router-dom";

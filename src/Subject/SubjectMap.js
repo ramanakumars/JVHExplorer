@@ -3,7 +3,7 @@ import { convert_to_lonlat, sanitize_longitude } from "../ShapeUtils/GeoUtils";
 import { Checkbox } from "../Inputs/Checkbox";
 import VortexEllipse from "../ShapeUtils/VortexEllipse";
 import { useState, useEffect, useContext } from "react";
-import { API_query_extracts, API_query_vortices } from "../API";
+import { API_query_extracts, API_query_vortices } from "../API/API";
 import { SubjectMetadataContext } from "./Subject";
 
 export default function SubjectMap({ }) {

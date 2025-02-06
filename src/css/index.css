@@ -35,3 +35,7 @@ div {
 .bar-inner {
     @apply bg-secondary-800 shadow-none border-0 !important;
 }
+
+.card-button {
+    @apply mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 rounded-full text-center font-bold text-black hover:bg-white hover:border-black;
+}

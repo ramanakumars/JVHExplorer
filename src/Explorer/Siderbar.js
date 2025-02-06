@@ -2,7 +2,7 @@ import { InputMultiRange } from "../Inputs/InputMultiRange";
 import { Checkbox } from "../Inputs/Checkbox";
 import { useState, useContext, useEffect } from "react";
 import { VortexData, FilteredVortexData } from "./Explorer";
-import { setMinMax, compareMinMax } from "./MinMax";
+import { setMinMax, compareMinMax } from "../ShapeUtils/MinMax";
 
 export default function Sidebar ({ }) {
     const { vortex_data } = useContext(VortexData);
@@ -16,8 +16,8 @@ export default function Sidebar ({ }) {
 
     useEffect(() => {
         if (vortex_data.length > 0) {
-            const sizes = vortex_data.map((vortex) => (Math.max(vortex.physical_width, vortex.physical_height) / 1000.));
-            const aspect_ratios = vortex_data.map((vortex) => (Math.max(vortex.physical_width, vortex.physical_height) / Math.min(vortex.physical_height, vortex.physical_width)));
+            const sizes = vortex_data.map((vortex) => (vortex.size / 1000));
+            const aspect_ratios = vortex_data.map((vortex) => (vortex.aspect_ratio));
             const perijoves = vortex_data.map((vortex) => (vortex.perijove));
             const num_extracts = vortex_data.map((vortex) => (vortex.num_extracts));
             setSize(setMinMax(sizes));
