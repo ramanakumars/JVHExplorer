@@ -1,8 +1,31 @@
 import { get_points, convert_to_lonlat, radians, colors } from "./GeoUtils";
 import { Polygon, Polyline, Popup } from "react-leaflet";
-import VortexPopup from "./VortexPopup";
+import VortexPopup, {Vortex} from "./VortexPopup";
+import React from "react";
 
-export default function VortexEllipse({ vortex, opacity, filled = true }) {
+interface VortexEllipseProps {
+    vortex: Vortex;
+    opacity: number;
+    filled?: boolean;
+}
+
+interface EllipseProps {
+    ellipse_params: {
+        x: number;
+        y: number;
+        rx: number;
+        ry: number;
+        angle: number;
+    };
+    lon0: number;
+    lat0: number;
+    color: string;
+    opacity: number;
+    filled: boolean;
+    children: React.ReactNode;
+}
+
+export default function VortexEllipse({ vortex, opacity, filled = true }: VortexEllipseProps) {
     var loni = 360 - vortex.lon;
     if (loni < -180) {
         loni += 360;
@@ -33,7 +56,7 @@ export default function VortexEllipse({ vortex, opacity, filled = true }) {
     );
 };
 
-const Ellipse = ({ ellipse_params, lon0, lat0, color, opacity, filled, children }) => {
+const Ellipse = ({ ellipse_params, lon0, lat0, color, opacity, filled, children }: EllipseProps) => {
     const points = get_points(ellipse_params);
 
     const PathComponent = filled ? Polygon : Polyline;
@@ -43,7 +66,7 @@ const Ellipse = ({ ellipse_params, lon0, lat0, color, opacity, filled, children 
     );
 
     return (
-        <PathComponent positions={positions} pathOptions={{ color: color }} opacity={opacity} weight={2}>
+        <PathComponent positions={positions} pathOptions={{ color: color, opacity: opacity, weight: 2}}>
             {children}
         </PathComponent>
     );
