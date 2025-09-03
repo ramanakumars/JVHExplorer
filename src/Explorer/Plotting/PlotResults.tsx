@@ -3,7 +3,6 @@ import { VscEdit } from "react-icons/vsc";
 import { RxCross2 } from "react-icons/rx";
 import { GiHistogram } from "react-icons/gi";
 import { PiChartScatterLight } from "react-icons/pi";
-import { IconContext } from "react-icons/lib";
 import PlotComponent from "./PlotComponent";
 
 interface PlotContainerProps {
@@ -83,27 +82,21 @@ const ChoosePlotType = ({
     onChange: (value: string) => void;
 }) => {
     return (
-        <IconContext.Provider value={{ size: "48" }}>
-            <div className="w-full p-2 flex flex-row justify-center items-stretch [&>div]:cursor-pointer">
-                <div
-                    className="w-52 mx-5 hover:bg-primary-300 flex flex-col justify-center items-center"
-                    onClick={() => onChange("histogram")}
-                >
-                    <>Histogram</>
-                    <>
-                        <GiHistogram />
-                    </>
-                </div>
-                <div
-                    className="w-52 h-full mx-5 hover:bg-primary-300 flex flex-col justify-center items-center"
-                    onClick={() => onChange("scatter")}
-                >
-                    <>Scatter plot</>
-                    <>
-                        <PiChartScatterLight />
-                    </>
-                </div>
+        <div className="w-full p-2 flex flex-row justify-center items-stretch [&>div]:cursor-pointer">
+            <div
+                className="w-52 mx-5 hover:bg-primary-300 flex flex-col justify-center items-center"
+                onClick={() => onChange("histogram")}
+            >
+                <>Histogram</>
+                <GiHistogram className="text-4xl" />
             </div>
-        </IconContext.Provider>
+            <div
+                className="w-52 h-full mx-5 hover:bg-primary-300 flex flex-col justify-center items-center"
+                onClick={() => onChange("scatter")}
+            >
+                <>Scatter plot</>
+                <PiChartScatterLight className="text-4xl" />
+            </div>
+        </div>
     );
 };

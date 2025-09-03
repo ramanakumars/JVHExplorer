@@ -21,6 +21,12 @@ export default function Sidebar({}) {
         currentMax: 36,
         maxValue: 36,
     });
+    const [latitude, setLatitude] = useState({
+        minValue: -70,
+        currentMin: -70,
+        currentMax: 70,
+        maxValue: 70,
+    });
     const [num_extract, setNumExtracts] = useState({
         minValue: 0,
         currentMin: 8,
@@ -33,7 +39,9 @@ export default function Sidebar({}) {
         currentMax: 5,
         maxValue: 5,
     });
-    const [colors_checked, setColorsChecked] = useState<Record<string, boolean>>({
+    const [colors_checked, setColorsChecked] = useState<
+        Record<string, boolean>
+    >({
         white: true,
         brown: true,
         red: true,
@@ -73,16 +81,34 @@ export default function Sidebar({}) {
                         compareMinMax(sizei, size) &&
                         compareMinMax(vortex.perijove, perijove) &&
                         compareMinMax(vortex.num_extracts, num_extract) &&
+                        compareMinMax(vortex.lat, latitude) &&
                         compareMinMax(aspect_ratioi, aspect_ratio) &&
                         colors_checked[vortex.color]
                     );
                 }),
             );
         }
-    }, [size, perijove, num_extract, aspect_ratio, colors_checked]);
+    }, [size, perijove, num_extract, aspect_ratio, latitude, colors_checked]);
 
     return (
         <div className="py-2 px-4 col-span-1 bg-primary-200 min-h-screen box-border [&>*]:my-6">
+            <InputMultiRange
+                key={latitude.minValue + latitude.maxValue}
+                minValue={latitude.minValue}
+                maxValue={latitude.maxValue}
+                step={0.05}
+                type="float"
+                text={"Latitude range"}
+                onChange={(minValue, maxValue) =>
+                    setLatitude((prevState) => ({
+                        ...prevState,
+                        currentMin: minValue,
+                        currentMax: maxValue,
+                    }))
+                }
+                defaultMin={latitude.minValue}
+                defaultMax={latitude.maxValue}
+            />
             <InputMultiRange
                 key={size.minValue + size.maxValue}
                 minValue={size.minValue}
