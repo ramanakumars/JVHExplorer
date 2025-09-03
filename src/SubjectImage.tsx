@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { get_points, radians, colors } from "./ShapeUtils/GeoUtils";
 import { API_query_subject_image } from "./API/API";
 
-interface Extract {
+export interface Extract {
   x: number;
   y: number;
   rx: number;
