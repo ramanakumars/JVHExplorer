@@ -55,13 +55,15 @@ export default function Sidebar({}) {
                 (vortex) => vortex.aspect_ratio,
             );
             const perijoves = vortex_data.map((vortex) => vortex.perijove);
-            const num_extracts = vortex_data.map(
-                (vortex) => vortex.num_extracts,
+            const num_extracts = vortex_data.map((vortex) =>
+                vortex.num_extracts ? vortex.num_extracts : 0,
             );
+            const latitude = vortex_data.map((vortex) => vortex.lat);
             setSize(setMinMax(sizes));
             setPerijove(setMinMax(perijoves));
             setAspectRatio(setMinMax(aspect_ratios));
             setNumExtracts(setMinMax(num_extracts));
+            setLatitude(setMinMax(latitude));
         }
     }, [vortex_data]);
 
@@ -80,7 +82,10 @@ export default function Sidebar({}) {
                     return (
                         compareMinMax(sizei, size) &&
                         compareMinMax(vortex.perijove, perijove) &&
-                        compareMinMax(vortex.num_extracts, num_extract) &&
+                        compareMinMax(
+                            vortex.num_extracts ? vortex.num_extracts : 0,
+                            num_extract,
+                        ) &&
                         compareMinMax(vortex.lat, latitude) &&
                         compareMinMax(aspect_ratioi, aspect_ratio) &&
                         colors_checked[vortex.color]

@@ -31,6 +31,18 @@ export default function VortexEllipse({
     opacity,
     filled = true,
 }: VortexEllipseProps) {
+    // const _vortex = {
+    //     x: 0,
+    //     y: 0,
+    //     rx: 0,
+    //     ry: 0,
+    //     angle: 0,
+    //     lat: 0,
+    //     lon: 0,
+    //     color: "",
+    //     ...vortex,
+    // };
+
     var loni = 360 - vortex.lon;
     if (loni < -180) {
         loni += 360;

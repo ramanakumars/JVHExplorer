@@ -95,11 +95,16 @@ const PlotSidebar = ({
                         dtype = "";
                     }
 
+                    // handle cases where variables are undefined
                     const minValue = Math.min(
-                        ...variable_sub.map((val) => parseValue(val, dtype, 0)),
+                        ...variable_sub.map((val) =>
+                            parseValue(val ? val : 0, dtype, 0),
+                        ),
                     );
                     const maxValue = Math.max(
-                        ...variable_sub.map((val) => parseValue(val, dtype, 0)),
+                        ...variable_sub.map((val) =>
+                            parseValue(val ? val : 0, dtype, 0),
+                        ),
                     );
 
                     return {
