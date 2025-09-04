@@ -1,7 +1,15 @@
+import React from "react";
 import { Link } from "react-router-dom";
 import { round } from "./GeoUtils";
+import { VortexDataType } from "../API/types";
 
-const VortexPopup = ({ vortex, link_enabled = true }) => {
+const VortexPopup = ({
+    vortex,
+    link_enabled = true,
+}: {
+    vortex: VortexDataType;
+    link_enabled?: boolean;
+}) => {
     return (
         <div className="flex flex-col container [&>span]:p-1">
             <strong>Vortex: {vortex.id}</strong>
@@ -15,15 +23,22 @@ const VortexPopup = ({ vortex, link_enabled = true }) => {
                 {round(vortex.physical_height / 1000)} km{" "}
             </span>
             <span># of classifications: {vortex.num_extracts} </span>
-            <span>Vortex size confidence: {round(vortex.probability * 100)}% </span>
-            {
-                link_enabled &&
+            <span>
+                Vortex size confidence: {round(vortex.probability * 100)}%{" "}
+            </span>
+            {link_enabled && (
                 <span>
-                    <Link to={"/vortex/" + vortex.id} target="_blank" rel="no-referrer">See more</Link>
+                    <Link
+                        to={"/vortex/" + vortex.id}
+                        target="_blank"
+                        rel="no-referrer"
+                    >
+                        See more
+                    </Link>
                 </span>
-            }
+            )}
         </div>
     );
-}
+};
 
 export default VortexPopup;

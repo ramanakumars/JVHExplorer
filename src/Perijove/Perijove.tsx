@@ -1,14 +1,15 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
 import { API_query_vortices } from "../API/API";
 import VortexEllipse from "../ShapeUtils/VortexEllipse";
+import { VortexDataType } from "../API/types";
 
-export default function Perijove({ perijove }) {
-    const [vortices, setVortices] = useState([]);
+export default function Perijove({ perijove }: { perijove: number }) {
+    const [vortices, setVortices] = useState<VortexDataType[]>([]);
 
     useEffect(() => {
         API_query_vortices(
-            "_size=max&num_extracts__gte=8&perijove=" + perijove
+            "_size=max&num_extracts__gte=8&perijove=" + perijove,
         ).then((data) => setVortices(data.rows));
     }, [perijove]);
 
@@ -29,10 +30,15 @@ export default function Perijove({ perijove }) {
                     />
 
                     {vortices.map((vortex) => (
-                        <VortexEllipse vortex={vortex} key={vortex.id} opacity={0.5}/>
+                        <VortexEllipse
+                            vortex={vortex}
+                            key={vortex.id}
+                            opacity={0.5}
+                        />
                     ))}
                 </MapContainer>
             </div>
         );
     }
 }
+

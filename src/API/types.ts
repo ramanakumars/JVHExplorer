@@ -22,27 +22,7 @@ export interface VorticesResponse {
     table: string;
     is_view: boolean;
     human_description_en: string;
-    rows: Array<{
-        rowid: number;
-        index: number;
-        perijove: number;
-        color: string;
-        lon: number;
-        lat: number;
-        x: number;
-        y: number;
-        rx: number;
-        ry: number;
-        angle: number;
-        angular_width: number;
-        angular_height: number;
-        physical_width: number;
-        physical_height: number;
-        id: string;
-        num_extracts: number;
-        probability: number;
-        closest_subject_id: number;
-    }>;
+    rows: Array<VortexDataType>;
     truncated: boolean;
     filtered_table_rows_count: number;
     expanded_columns: any[];
@@ -63,31 +43,33 @@ export interface VorticesResponse {
     query_ms: number;
 }
 
+export interface Extract {
+    rowid: number;
+    index: number;
+    subject_id: number;
+    perijove: number;
+    color: string;
+    lon: number;
+    lat: number;
+    x: number;
+    y: number;
+    rx: number;
+    ry: number;
+    angle: number;
+    probability: number;
+    angular_width: number;
+    angular_height: number;
+    physical_width: number;
+    physical_height: number;
+    vortex: string;
+}
+
 export interface ExtractsResponse {
     database: string;
     table: string;
     is_view: boolean;
     human_description_en: string;
-    rows: Array<{
-        rowid: number;
-        index: number;
-        subject_id: number;
-        perijove: number;
-        color: string;
-        lon: number;
-        lat: number;
-        x: number;
-        y: number;
-        rx: number;
-        ry: number;
-        angle: number;
-        probability: number;
-        angular_width: number;
-        angular_height: number;
-        physical_width: number;
-        physical_height: number;
-        vortex: string;
-    }>;
+    rows: Array<Extract>;
     truncated: boolean;
     filtered_table_rows_count: number;
     expanded_columns: any[];
@@ -111,20 +93,44 @@ export interface ExtractsResponse {
     query_ms: number;
 }
 
-export interface SubjectsResponse extends Array<{
+export interface SubjectMetadataType {
     // Define the structure of the response object here
-    rowid: number,
-    index: number,
-    subject_id: number,
-    latitude: number,
-    longitude: number,
-    perijove: number
-}>{}
+    rowid: number;
+    index: number;
+    subject_id: number;
+    latitude: number;
+    longitude: number;
+    perijove: number;
+}
+
+export interface SubjectsResponse extends Array<SubjectMetadataType> {}
 
 export interface SubjectImageResponse {
     subjects: Array<{
         locations: Array<{
-            'image/png': string;
+            "image/png": string;
         }>;
     }>;
+}
+
+export interface VortexDataType {
+    rowid: number;
+    index: number;
+    perijove: number;
+    color: string;
+    lon: number;
+    lat: number;
+    x: number;
+    y: number;
+    rx: number;
+    ry: number;
+    angle: number;
+    angular_width: number;
+    angular_height: number;
+    physical_width: number;
+    physical_height: number;
+    id: string;
+    num_extracts?: number;
+    probability: number;
+    closest_subject_id?: number;
 }
