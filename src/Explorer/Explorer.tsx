@@ -71,7 +71,7 @@ export default function Explorer({}) {
 }
 
 const ExplorerResults = () => {
-    const [result_type, setResultType] = useState(ResultType.PLOT_ONLY);
+    const [result_type, setResultType] = useState(ResultType.DATA_ONLY);
 
     return (
         <div className="p-2 col-span-4">
