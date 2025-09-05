@@ -134,3 +134,12 @@ export interface VortexDataType {
     probability: number;
     closest_subject_id?: number;
 }
+
+export interface EllipseType {
+    x: number;
+    y: number;
+    rx: number;
+    ry: number;
+    angle: number;
+    color: string;
+}

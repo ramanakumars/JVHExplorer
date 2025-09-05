@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { round } from "./GeoUtils";
+import { round } from "../ShapeUtils/GeoUtils";
 import { VortexDataType } from "../API/types";
 
 const VortexPopup = ({

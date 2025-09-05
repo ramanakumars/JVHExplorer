@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { API_query_subjects } from "../API/API";
 import { lonlat_to_pixel } from "../ShapeUtils/GeoUtils";
-import SubjectImage, { Ellipse } from "../SubjectImage";
+import SubjectImage  from "../SubjectImage";
+import { EllipseType } from "../API/types";
 import { VortexExtendedDataType } from "./DataContext";
 
 export default function VortexSample({
@@ -10,7 +11,7 @@ export default function VortexSample({
 }: {
     vortex: VortexExtendedDataType;
 }) {
-    const [ellipse_path, setEllipsePath] = useState<Ellipse[]>([
+    const [ellipse_path, setEllipsePath] = useState<EllipseType[]>([
         { x: 192, y: 192, rx: 30, ry: 30, angle: 0, color: "blue" },
     ]);
 

@@ -1,61 +1,68 @@
 import React, { useState, useEffect } from "react";
 import { get_points, radians, colors } from "./ShapeUtils/GeoUtils";
 import { API_query_subject_image } from "./API/API";
-
-export interface Ellipse {
-  x: number;
-  y: number;
-  rx: number;
-  ry: number;
-  angle: number;
-  color: string;
-}
+import { EllipseType } from "./API/types";
 
 interface SubjectImageProps {
-  subject_id: string;
-  extracts: Ellipse[];
-  title?: string;
+    subject_id: string;
+    extracts: EllipseType[];
+    title?: string;
 }
 
-const SubjectImage: React.FC<SubjectImageProps> = ({ subject_id, extracts, title }) => {
-  const [subject_url, setSubjectUrl] = useState<string | null>(null);
-  const [ellipses, setEllipses] = useState<[number, number][][]>([]);
+const SubjectImage: React.FC<SubjectImageProps> = ({
+    subject_id,
+    extracts,
+    title,
+}) => {
+    const [subject_url, setSubjectUrl] = useState<string | null>(null);
+    const [ellipses, setEllipses] = useState<[number, number][][]>([]);
 
-  useEffect(() => {
-    API_query_subject_image(subject_id).then((url) => setSubjectUrl(url));
-  }, [subject_id]);
+    useEffect(() => {
+        API_query_subject_image(subject_id).then((url) => setSubjectUrl(url));
+    }, [subject_id]);
 
-  useEffect(() => {
-    setEllipses(
-      extracts.map((extract) =>
-        get_points({
-          x: extract.x,
-          y: extract.y,
-          rx: extract.rx,
-          ry: extract.ry,
-          angle: radians(extract.angle),
-        })
-      )
+    useEffect(() => {
+        setEllipses(
+            extracts.map((extract) =>
+                get_points({
+                    x: extract.x,
+                    y: extract.y,
+                    rx: extract.rx,
+                    ry: extract.ry,
+                    angle: radians(extract.angle),
+                }),
+            ),
+        );
+    }, [extracts]);
+
+    return (
+        <div className="bg-primary-200">
+            <h1 className="text-sm w-full text-center">
+                {title ? title : <>Subject: {subject_id}</>}
+            </h1>
+            <svg viewBox="0 0 384 384">
+                <image
+                    x="0"
+                    y="0"
+                    width="384"
+                    height="384"
+                    href={subject_url || ""}
+                />
+                {ellipses.map((points, index) => (
+                    <polyline
+                        key={`${subject_id} ${index}`}
+                        points={points
+                            .map((point) => `${point[0]},${point[1]}`)
+                            .join(" ")}
+                        style={{
+                            fill: "none",
+                            stroke: colors[extracts[index].color],
+                        }}
+                    />
+                ))}
+            </svg>
+        </div>
     );
-  }, [extracts]);
-
-  return (
-    <div className="bg-primary-200">
-      <h1 className="text-sm w-full text-center">
-        {title ? title : <>Subject: {subject_id}</>}
-      </h1>
-      <svg viewBox="0 0 384 384">
-        <image x="0" y="0" width="384" height="384" href={subject_url || ''} />
-        {ellipses.map((points, index) => (
-          <polyline
-            key={`${subject_id} ${index}`}
-            points={points.map((point) => `${point[0]},${point[1]}`).join(" ")}
-            style={{ fill: "none", stroke: colors[extracts[index].color] }}
-          />
-        ))}
-      </svg>
-    </div>
-  );
 };
 
 export default SubjectImage;

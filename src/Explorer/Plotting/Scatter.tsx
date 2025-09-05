@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Slider } from "../../Inputs/Slider";
-import VortexPopup from "../../ShapeUtils/VortexPopup";
+import VortexPopup from "../../Vortex/VortexPopup";
 import { useState, useEffect, useContext } from "react";
 import { FilteredVortexData } from "../DataContext";
 import plottable_variables from "./PlottableVariables";

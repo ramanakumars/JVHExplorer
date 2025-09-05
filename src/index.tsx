@@ -5,7 +5,7 @@ import { BrowserRouter, Route, Routes, useParams } from "react-router-dom";
 import PerijoveSelector from "./PerijoveSelector";
 import Nav from "./Nav";
 import Perijove from "./Perijove/Perijove";
-import Vortex from "./Vortex";
+import Vortex from "./Vortex/Vortex";
 import Explorer from "./Explorer/Explorer";
 import Subject from "./Subject/Subject";
 

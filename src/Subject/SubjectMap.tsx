@@ -2,13 +2,12 @@ import { MapContainer, TileLayer, Polyline } from "react-leaflet";
 import React from "react";
 import { convert_to_lonlat, sanitize_longitude } from "../ShapeUtils/GeoUtils";
 import { Checkbox } from "../Inputs/Checkbox";
-import VortexEllipse from "../ShapeUtils/VortexEllipse";
+import VortexEllipse from "../Vortex/VortexEllipse";
 import { useState, useEffect, useContext, useMemo } from "react";
 import { API_query_extracts, API_query_vortices } from "../API/API";
 import { SubjectMetadataContext } from "./Subject";
 import { Extract } from "../API/types";
 import { VortexDataType } from "../API/types";
-import { Ellipse } from "../SubjectImage";
 
 export default function SubjectMap({}) {
     const [show_vortices, setShowVortices] = useState(false);
