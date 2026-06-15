@@ -4,6 +4,7 @@ import { VortexDataType } from "../API/types";
 export interface VortexExtendedDataType extends VortexDataType {
     size: number;
     aspect_ratio: number;
+    physical_area: number;
 }
 
 export interface VortexDataContextType {

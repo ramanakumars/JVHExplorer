@@ -71,23 +71,15 @@ export default function Sidebar({}) {
         if (vortex_data.length > 0) {
             setFilteredVortexData(
                 vortex_data.filter((vortex) => {
-                    const sizei =
-                        Math.max(
-                            vortex.physical_height,
-                            vortex.physical_width,
-                        ) / 1000;
-                    const aspect_ratioi =
-                        (1000 * sizei) /
-                        Math.min(vortex.physical_height, vortex.physical_width);
                     return (
-                        compareMinMax(sizei, size) &&
+                        compareMinMax(vortex.size / 1000, size) &&
                         compareMinMax(vortex.perijove, perijove) &&
                         compareMinMax(
                             vortex.num_extracts ? vortex.num_extracts : 0,
                             num_extract,
                         ) &&
                         compareMinMax(vortex.lat, latitude) &&
-                        compareMinMax(aspect_ratioi, aspect_ratio) &&
+                        compareMinMax(vortex.aspect_ratio, aspect_ratio) &&
                         colors_checked[vortex.color]
                     );
                 }),

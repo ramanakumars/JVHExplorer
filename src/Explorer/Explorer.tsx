@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { API_query_vortices } from "../API/API";
-import Sidebar from "./Siderbar";
+import Sidebar from "./Sidebar";
 import FilteredVortices from "./FilteredVortices";
 import { LoadingPage } from "../LoadingPage";
 import PlotResults from "./Plotting/PlotResults";
@@ -16,9 +16,32 @@ const ResultType = Object.freeze({
     PLOT_ONLY: { name: "plot" },
 });
 
+function exportFilteredJSON(rows: VortexExtendedDataType[]) {
+    const blob = new Blob(
+        [
+            JSON.stringify(
+                rows.map(({ rowid, index, ...rest }) => rest),
+                null,
+                2,
+            ),
+        ],
+        {
+            type: "application/json",
+        },
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `vortices_${rows.length}_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
 export default function Explorer({}) {
     const [vortex_data, setVortexData] = useState<VortexExtendedDataType[]>([]);
-    const [filtered_vortex_data, setFilteredVortexData] = useState([]);
+    const [filtered_vortex_data, setFilteredVortexData] = useState<
+        VortexExtendedDataType[]
+    >([]);
     const [loading_enabled, setLoading] = useState(true);
 
     useEffect(() => {
@@ -36,6 +59,10 @@ export default function Explorer({}) {
                         vortex.physical_width,
                         vortex.physical_height,
                     ),
+                    physical_area:
+                        Math.PI *
+                        vortex.physical_width *
+                        vortex.physical_height,
                 })),
             ),
         );
@@ -63,8 +90,8 @@ export default function Explorer({}) {
                     }}
                 >
                     <Sidebar />
+                    <ExplorerResults />
                 </VortexData.Provider>
-                <ExplorerResults />
             </FilteredVortexData.Provider>
         </div>
     );
@@ -73,8 +100,11 @@ export default function Explorer({}) {
 const ExplorerResults = () => {
     const [result_type, setResultType] = useState(ResultType.PLOT_ONLY);
 
+    const { filtered_vortex_data } = useContext(FilteredVortexData);
+    const { vortex_data } = useContext(VortexData);
+
     return (
-        <div className="p-2 col-span-4">
+        <div className="p-2 col-span-4 flex flex-col flex-nowrap gap-2">
             <div>
                 <Switch
                     name="result_type"
@@ -84,6 +114,20 @@ const ExplorerResults = () => {
                     }
                     selected={result_type}
                 />
+            </div>
+            <div className="w-full rounded-xl bg-gray-600 text-white p-4 flex flex-row flex-nowrap justify-between items-center">
+                <span className="w-full">
+                    Filtering {filtered_vortex_data.length} out of{" "}
+                    {vortex_data.length}
+                </span>
+                <span>
+                    <button
+                        className="bg-primary-500 p-2 cursor-pointer hover:bg-gray-400 rounded-xl"
+                        onClick={() => exportFilteredJSON(filtered_vortex_data)}
+                    >
+                        Export JSON
+                    </button>
+                </span>
             </div>
             <div className="w-full p-2">
                 <FilteredVortices

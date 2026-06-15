@@ -44,15 +44,29 @@ export const Histogram = ({
     }, [plot_variables, filtered_vortex_data, PlotStyle.histogram]);
 
     if (data.length > 0) {
+        console.log(data);
         return (
             <Plot
-                data={data}
+                data={
+                    PlotStyle.histogram?.xscale === "linear"
+                        ? data
+                        : [
+                              {
+                                  ...data[0],
+                                  x: data[0].x.map((xi) => Math.log10(xi)),
+                              },
+                          ]
+                }
                 layout={{
                     xaxis: {
                         title: {
-                            text: plottable_variables[
-                                plot_variables.x as keyof typeof plottable_variables
-                            ].name,
+                            text:
+                                (PlotStyle.histogram?.xscale === "linear"
+                                    ? ""
+                                    : "Log10 ") +
+                                plottable_variables[
+                                    plot_variables.x as keyof typeof plottable_variables
+                                ].name,
                         },
                     },
                     yaxis: {
@@ -85,6 +99,7 @@ export const Histogram = ({
 
 export const HistogramPlotStyle = () => {
     const [yscale, setYScale] = useState("linear");
+    const [xscale, setXScale] = useState("linear");
     const [numBins, setNumBins] = useState(20);
     const { PlotStyle, setPlotStyle } = useContext(PlotStyleContext);
 
@@ -93,10 +108,11 @@ export const HistogramPlotStyle = () => {
             ...PlotStyle,
             histogram: {
                 yscale: yscale as "linear" | "log",
+                xscale: xscale as "linear" | "log",
                 numBins: Number(numBins),
             },
         });
-    }, [yscale, numBins]);
+    }, [xscale, yscale, numBins]);
 
     return (
         <div className="w-full p-2 flex flex-col justify-start items-stretch">
@@ -109,6 +125,16 @@ export const HistogramPlotStyle = () => {
                 ]}
                 value={yscale}
                 onChange={setYScale}
+            />
+            <Select
+                id={"xscale"}
+                var_name={"x-axis scale"}
+                variables={[
+                    { id: "linear", name: "Linear" },
+                    { id: "log", name: "Log" },
+                ]}
+                value={xscale}
+                onChange={setXScale}
             />
             <Slider
                 minValue={5}

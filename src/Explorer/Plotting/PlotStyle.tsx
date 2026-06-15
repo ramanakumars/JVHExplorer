@@ -10,6 +10,7 @@ export interface PlotStyleProps {
     histogram?: {
         numBins?: number;
         yscale?: "linear" | "log";
+        xscale?: "linear" | "log";
     };
 }
 
