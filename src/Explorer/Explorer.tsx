@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { API_query_vortices } from "../API/API";
-import Sidebar from "./Siderbar";
+import Sidebar from "./Sidebar";
 import FilteredVortices from "./FilteredVortices";
 import { LoadingPage } from "../LoadingPage";
 import PlotResults from "./Plotting/PlotResults";
